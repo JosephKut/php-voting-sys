@@ -1,0 +1,372 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Open Sans',sans-serif;
+}
+
+/* @property --angle{
+    syntax: "<angle>";
+    initial-value: 0deg;
+    inherits: false;
+} */
+
+body{
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    width: 100%;
+    background: url(images/aa.jpg);
+    /* background-color: #068a11; */
+    /* background: conic-gradient(from var(--angle),#860505,#880681,#860505);
+    animation: 1s spin linear infinite; */
+    background-repeat: repeat;
+    top: 30px;
+    background-position: left top -60px;
+    background-size: cover;
+}
+
+.but h4{
+    color: #ddc918;
+}
+
+.but h5{
+    color: #ddc918;
+}
+
+/* @keyframes spin{
+    from{
+        --angle: 0deg;
+    }
+    to{
+        --angle: 360deg;
+    } */
+/* } */
+
+.wrapper{
+    
+    width: 100%;
+    padding: 20px;
+    /* border: 1px solid rgba(225, 225, 225, 0.5); */
+    border-radius: 8px;
+    text-align: center;
+    display: flex;
+    /* backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px); */
+}
+
+#h {
+    display: flex;
+    height: 12%;
+    width: 100%;
+    justify-content: space-between;
+    /* backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px); */
+}
+
+#hb{
+    display: flex;
+    align-content: center;
+    justify-content: right;
+    width: 80%;
+}
+.but h1{
+    color:#ddc918;
+    margin-top: 30px;
+    align-content: center;
+    justify-content: center;
+    margin-left: 5%;
+    /* width: 20%;
+    border-radius: 5px; */
+}
+
+li{
+    text-decoration: none;
+}
+
+a{
+    align-content: center;
+    text-decoration: none;
+    background: rgba(225, 225, 225, 0.15);
+    border: 1px solid rgba(225, 225, 225, 0.5);
+    color: #ddc918;
+    border-color: #ddc918;
+    text-decoration: none;
+    border-radius: 10px;
+    margin: 2%;
+    padding: 0% 5%;
+}
+
+a:hover{
+    color: #ddc918;
+    border: 1px solid rgba(225, 225, 225, 0.5);
+    background: transparent;
+}
+
+.but{
+    width: 20%;
+    display: flex;
+    flex-direction: column;
+}
+
+button{
+    color: #ddc918;
+    /* background: rgba(225, 225, 225, 0.5); */
+    text-decoration: none;
+    border: 1px solid rgba(225, 225, 225, 0.5);
+    background: transparent;
+    font-size:1em;
+    border-radius: 5px;
+    margin: 20px;
+    backdrop-filter: blur(90px);
+    -webkit-backdrop-filter: blur(90px);
+}
+
+.but button:hover{
+    font-size: 1em;
+}
+
+button:hover{
+    background-color: rgba(225, 225, 225, 0.5);
+    border: 0;
+}
+
+.ses-but{
+    margin: 5px;
+}
+
+.content{
+    /* padding: 5%; */
+    width: 100%;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    backdrop-filter: blur(90px);
+    -webkit-backdrop-filter: blur(90px);
+    /*align-content: center;
+    justify-content: center;*/
+    /* background: white; */
+    /* background: linear-gradient(#ddc918,#91cf96,#ddc918); */
+}
+
+.data{
+    margin: 5% 1% 0 auto;
+    display: flex;
+    flex-direction: column;
+    width: 20%;
+}
+
+.data form{
+    margin: 0;
+    padding: 0;
+}
+
+.data button{
+    width: 80%;
+    text-decoration: none;
+    background: rgba(225, 225, 225, 0.15);
+    border: 1px solid #ddc918;
+    color: #ddc918;
+    border-radius: 5px;
+    margin: 10px 10px;
+}
+
+.data button:hover{
+    background: transparent;
+    border: 1px solid rgba(225, 225, 225, 0.15);
+}
+
+.dash{
+    display: flex;
+}
+#dash h2{
+    margin-top: 2%;
+    color: #ddc918;
+}
+
+.Cdash{
+    background: rgba(225, 225, 225, 0.15);
+    border: 1px solid rgba(225, 225, 225, 0.5);
+    color: #ddc918;
+    border-color: #ddc918;
+    border-radius: 20px;
+    margin: 4% 10% 10% 10%;
+    text-align: center;
+    align-content: center;
+    width: 30%;
+    height: 50%;
+    border-radius: 5px;
+}
+
+.Sdash{ 
+    background: rgba(225, 225, 225, 0.15);
+    border: 1px solid rgba(225, 225, 225, 0.5);
+    color: #ddc918;
+    border-color: #ddc918;
+    margin: 4% 10% 10% 10%;
+    border-radius: 20px;
+    width: 30%;
+    height: 50%;
+}
+
+form{
+    width: 100%;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+}
+
+form h2{
+    font-size: 2rem;
+    color: #ddc918;
+    margin-bottom: 20px;
+}
+
+.input-field{
+    position: relative;
+    margin: 15px 0;
+    border-bottom: 2px solid #ddc918;
+}
+
+.input-field input{
+    width: 100%;
+    height: 40px;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #fff;
+    font-size: 1rem;
+}
+
+.input-field label{
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    color:  #ddc918;
+    font-size: 1rem;
+    pointer-events: none;
+}
+
+.input-field input:focus~label,
+.input-field input:valid~label{
+    transform: translateY(-120%);
+    font-size: 0.8rem;
+    top:10px;
+    transition: 0.3s ease;
+}
+
+.selector{
+    color: #fff;
+    border: 0;
+    background: transparent;
+}
+
+select{
+    background-color: transparent;
+    border: 1px solid #ddc918;
+    border-radius: 5px;
+    color: #fff;
+}
+
+/* .input-file{
+    background-color: transparent;
+    border: 0 solid #ddc918;
+    border-radius: 5px;
+    color: #fff;
+} */
+
+form button{
+    color: #ddc918;
+    border-color: #fff;
+    width: 10%;
+}
+
+form label{
+    color: #ddc918;
+}
+
+#ed{
+    margin-top: 5%;
+}
+table{
+    background: transparent;
+    color: #ddc918;
+    border: 1px solid rgba(225, 225, 225, 0.5);
+    margin-top: 5%;
+    width: 80%;
+    margin-left: 10%;
+    border-radius: 10px;
+}
+
+th{
+    color: #ddc918;
+}
+
+tr{
+    background: rgba(225, 225, 225, 0.15);
+    color: #fff;
+    border-radius: 50px;
+}
+
+td{
+    text-align: center;
+}
+
+.po{
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.poc{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#poll{
+    /* justify-content: center; */
+    align-content: center;
+}
+
+#viewC{
+    height: 700px;
+    overflow: auto;
+}
+#viewR{
+    height: 700px;
+    overflow: auto;
+}
+#NB{
+    height: 700px;
+    overflow: auto;
+}
+
+#ST{
+    height: 700px;
+    overflow: auto;
+}
+
+.state{
+    color: #000;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: right;
+    align-items: right;
+    
+}
+
+.state button{
+    background: rgba(225, 225, 225, 0.15);
+    color: #ddc918;
+    width: 20%;
+    text-decoration: none;
+    border: 1px solid #ddc918;
+    border-radius: 5px;
+    margin: 10px 10px;
+}
+
+.state button:hover{
+    background: transparent;
+    border-color: rgba(225, 225, 225, 0.15);
+}

@@ -1,0 +1,115 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", "sans-serif";
+}
+
+body{
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-image: url('images/aa.jpg');
+    background-repeat: no-repeat;
+    background-position: left;
+    background-size: cover;
+}
+
+.wrapper{
+    
+    width: 45%;
+    height:60vh;
+    justify-content: center;
+    /* padding: 20px; */
+    border: 1px solid rgba(225, 225, 225, 0.5);
+    border-radius: 30px;
+    text-align: center;
+    display: flex;
+}
+
+.pv{
+    background: linear-gradient(to bottom,#e2e2e2,#65f578);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    border-radius: 30px;
+}
+
+#waterm{
+    background-image: url('images/u3.jpeg');
+    position: absolute;
+    width: 45%;
+    height: 60vh;
+    background-size: 100%;
+    background-repeat: repeat;
+    opacity: 0.1;
+    border-radius: 30px;
+}
+
+.container{
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    width: 40%;
+    padding: 30px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+}
+
+h4{
+    text-align: center;
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+}
+
+.input-field{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.input-field input{
+    height: 45px;
+    width: 45px;
+    margin: 5px;
+    outline: none;
+    border: 1px solid #65f578;
+    border-radius: 6px;
+    text-align: center;
+}
+
+.input-field input::-webkit-inner-spin-button,
+.input-field input::-webkit-inner-spin-button{
+    display: none;
+}
+
+form button{
+    background: #65f578;
+    width: 100%;
+    border: 0;
+    border-radius: 2px;
+    margin: 10px 0;
+    padding: 5px 0;
+    color: #fff;
+    transition: all 0.2s ease;
+}
+
+form button:hover{
+    background: #298535;
+}
+
+#pop-up{
+    position: absolute;
+    top: 100px;
+    /* right: 10px; */
+    z-index: 2;
+    background: #fff;
+    height: 200px;
+    width: 50%;
+    justify-content: center;
+    border-radius: 12px;
+}
