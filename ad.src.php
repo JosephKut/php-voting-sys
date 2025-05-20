@@ -26,9 +26,9 @@ $posts=get_post();
         <h1></h1>
         <!-- <img src="https://acses-srid.vercel.app/"> -->
         <div id="hb">
-        <a href="ad.src.php?Login=success">SRC</a>
-        <a href="ad.jcr.php?Login=success">JCR</a>
-        <!-- <a href="ad.dept.php?Login=success">DEPARTMENTAL</a> -->
+            <a href="ad.src.php?Login=success">SRC</a>
+            <a href="ad.jcr.php?Login=success">JCR</a>
+            <!-- <a href="ad.dept.php?Login=success">DEPARTMENTAL</a> -->
         </div>
     </div>
     <div class="wrapper">
@@ -80,7 +80,7 @@ $posts=get_post();
                         <button class="ses-but" name="sst" id="sst" style="width:40%; color: black;">Start</button>
                         <button class="ses-but" name="ssp" id="ssp" style="width:40%; color: black;">Stop</button>
                         <?php
-                            $get_s="SELECT * FROM session";
+                            $get_s="SELECT * FROM src_session";
                             $session=$conn->query($get_s);
                             $ses=$session->fetch_assoc();
                             if ($ses['session']=='start'){
@@ -169,7 +169,7 @@ $posts=get_post();
             </form>
         </div>
 
-        <div class="content" id="deptM" style="display: none;">
+        <!-- <div class="content" id="deptM" style="display: none;">
             <form action="src.php" method="post" enctype="multipart/form-data">
                 <h2>Departmental Management</h2>
                 <div class="input-field">
@@ -209,7 +209,7 @@ $posts=get_post();
                     <button name="deleteD">Delete</button>
                 </div>
             </form>
-        </div>
+        </div> -->
 
         <div class="content" id="viewC" style="display: none;">
         <table >
@@ -222,16 +222,17 @@ $posts=get_post();
                      <th>Type</th>
                  </tr>
                  <?php
-                 include 'connect.php';
-                 $getPost="SELECT * FROM post";
-                 $result=$conn->query($getPost);
-                 foreach($result as $Pin){
-                 echo "
-                 <tr>
-                     <td>$Pin[Post_id]</td>
-                     <td>$Pin[Post]</td>
-                     <td>$Pin[Type]</td>
-                 </tr>";}
+                    include 'connect.php';
+                    $getPost="SELECT * FROM src_post";
+                    $result=$conn->query($getPost);
+                    foreach($result as $Pin){
+                    $Position = str_replace("_"," ",$Pin['Post']);
+                    echo "
+                    <tr>
+                        <td>$Pin[Post_id]</td>
+                        <td>$Position</td>
+                        <td>$Pin[Type]</td>
+                    </tr>";}
                  ?>
              </table>
              <?php
@@ -239,8 +240,8 @@ $posts=get_post();
              ?>
          </div>
          <div class="content" id="viewR" style="display: none;">
+            <h2>VOTING RESULTS</h2>
             <form action="src.php" methiod="get">
-                <h2>VOTING RESULTS</h2>
                 <div class="state">
                     <button name='src_chart' title="Graphical representation of results.">Charts</button>
                 </div>
@@ -249,12 +250,9 @@ $posts=get_post();
                 foreach($posts as $post){
                     sort_result($post['POST']);   
                 }
-                // sort_result('President');
-                // sort_result('General_Secretary');
-                // sort_result('NUGS_President');
             ?>
          </div>
-         <div class="content" id="NB" style="display: none; padding: 1%; justify-content: center;  align-content: center;">
+         <!-- <div class="content" id="NB" style="display: none; padding: 1%; justify-content: center;  align-content: center;">
             <form action="src.php" method="post" enctype="multipart/form-data" style="height:100%;">
                 <h2>Notice Board</h2>
                 <textarea name="msg" placeholder="Message" style="height: 600%; width: 80%; padding: 1%;"></textarea>
@@ -275,7 +273,7 @@ $posts=get_post();
             <details>
                 <summary><h3>Preview Notes</h3></summary>
                 <?php
-                $select="SELECT * FROM NB";
+                $select="SELECT * FROM src_NB";
                 $sel=$conn->query($select);
                 foreach ($sel as $info){
                     if (!empty($info['Message'])){
@@ -289,12 +287,13 @@ $posts=get_post();
                 }
               ?>
             </details>
-         </div>
+         </div> -->
+
          <div class="content" id="ST" style="display: none; padding: 1%;  align-content: center;">
-            <div class="state">
+            <!-- <div class="state">
                 <button id="Bstate">EC Stament</button>
                 <button id="Bfeedback">Voters Feedback</button>
-            </div>
+                </div> -->
                 <form id="state" action="src.php" method="post" enctype="multipart/form-data" style="height:100%;">
                     <!-- <h2>Notice Board</h2> -->
                     <input name="title" placeholder="Title" style="height: 50%; width: 100%; padding: 1%; margin: 1%;"></input>
@@ -310,7 +309,7 @@ $posts=get_post();
                     <details>
                         <summary><h3>Preview Statement</h3></summary>
                         <?php
-                        $select="SELECT * FROM ec_statement";
+                        $select="SELECT * FROM src_ec_statement";
                         $sel=$conn->query($select);
                         foreach ($sel as $info){
                             if (!empty($info['Title'])){
@@ -329,7 +328,7 @@ $posts=get_post();
                 </form>
                 <!-- <div  id="feedback" style="display: none;">
                     <?php
-                    $select="SELECT * FROM Feedback";
+                    $select="SELECT * FROM src_Feedback";
                     $sel=$conn->query($select);
                     $n=0;
                     echo"<h2>Feedbacks</h2>";
@@ -343,9 +342,9 @@ $posts=get_post();
                     ?>
                 </div> -->
          </div>
-    <script src="nav.js"></script>
+    <script src="nav.js" type="text/javascript"></script>
     <script src="canvasjs.min.js"></script>
-    <script>
+    <!-- <script>
         const state=document.getElementById('state');
         const feedback=document.getElementById('feedback');
 
@@ -358,6 +357,6 @@ $posts=get_post();
             state.style.display="none";
             feedback.style.display="block";
         })
-    </script>
+    </script> -->
 </body>
 </html>

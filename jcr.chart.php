@@ -10,20 +10,20 @@
     <script src="canvasjs.min.js"></script>
     <div class="wrapper" style="flex-direction: column;">
         <div class="content" style="height: 100%;">
-            <div id="h" style="margin:1%;">
+            <!-- <div id="h" style="margin:1%;">
                 <img src="images/u9.PNG">
-            </div>
-            <h1>SRC RESULT CHART</h1>
+            </div> -->
+            <h1>JCR RESULT CHART</h1>
             <?php
             function sort_resut($VP){
                 include 'connect.php';
                 $table_check="SHOW TABLES LIKE '$VP'";
-                $table=$jconn->query($table_check);
+                $table=$conn->query($table_check);
                 if ($table->num_rows>0){
                     $getcandidates="SELECT * FROM candidate WHERE Post='$VP'";
-                    $result=$jconn->query($getcandidates);
+                    $result=$conn->query($getcandidates);
                     $getPost="SELECT * FROM post WHERE Post='$VP'";
-                    $format=$jconn->query($getPost);
+                    $format=$conn->query($getPost);
                     $row=$format->fetch_assoc();
                     $n=1;
                     $N=2;
@@ -34,7 +34,7 @@
                         $dataPoints = array();
                         foreach($result as $Pin){
                             $getresult="SELECT * FROM $VP WHERE Candidate='$Pin[Full_Name]'";
-                            $poll=$jconn->query($getresult);
+                            $poll=$conn->query($getresult);
                             $pollC=$poll->num_rows;
 
                             $temp_array = array("y" => $pollC, "label" => $Pin['Full_Name'] );
@@ -72,10 +72,10 @@
                         $dataPoints2 = array();
                         foreach($result as $Pin){
                             $getresult="SELECT * FROM $VP WHERE Candidate='$Pin[Full_Name]' AND Votes='1'";
-                            $poll=$jconn->query($getresult);
+                            $poll=$conn->query($getresult);
                             $pollC=$poll->num_rows;
                             $getresult2="SELECT * FROM $VP WHERE Candidate='$Pin[Full_Name]' AND Votes='2'";
-                            $poll2=$jconn->query($getresult2);
+                            $poll2=$conn->query($getresult2);
                             $pollC2=$poll2->num_rows;
 
                             $dataPointsYes = array("y" => $pollC, "label" => $Pin['Full_Name'] );

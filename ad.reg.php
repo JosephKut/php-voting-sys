@@ -1,3 +1,7 @@
+<?php
+session_start();
+$_SESSION['Email']="josephkuttor730@gmail.com";
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>

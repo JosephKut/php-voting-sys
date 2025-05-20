@@ -1,18 +1,42 @@
 <?php
 session_start();
 
-if (isset($_GET['token']) && isset($_GET['time']) && isset($_GET['hash'])){
-$token = $_GET['token'];
-$time = $_GET['time'];
-$hash = $_GET['hash'];
-}
-else{
-    include 'invalid.php';
-    die();
-}
+// if (isset($_GET['token']) && isset($_GET['time']) && isset($_GET['hash'])){
+// $token = $_GET['token'];
+// $time = $_GET['time'];
+// $hash = $_GET['hash'];
+// }
+// else{
+//     include 'invalid.php';
+//     die();
+// }
 
 include("connect.php");
 include("func.php");
+
+$posts=get_post();
+echo"
+    <script>
+        var postButtonID = [];
+        var postID = [];
+        var postContentID =[];
+    </script>";
+foreach($posts as $post){
+    $Post[] = $post['POST'];
+    $DPost[] = str_replace("_"," ",$post['POST']);
+    $a = "sb".$post['POST'];
+    $postButtonID[] = $a;
+    $b = "s".$post['POST'];
+    $postID[] = $b;
+    $c = "sc".$post['POST'];
+    $postContentID[] = $c;
+    echo"
+    <script>
+        postButtonID.push('$a');
+        postID.push('$b');
+        postContentID.push('$c');
+    </script>";   
+}
 
 ?>
 
@@ -27,7 +51,7 @@ include("func.php");
 </head>
 <body>
 
-    <div class="login-wrapper" id="log-flex" style="display:none;">
+    <!-- <div class="login-wrapper" id="log-flex" style="display:none;">
         <form method="post" action=<?php echo $_SERVER['REQUEST_URI']; ?>>
             <h2>Login</h2>
             <div class="input-field">
@@ -41,133 +65,63 @@ include("func.php");
             <button type="submit" name="signIn">Log In</button>
         </form>
         <div class="im">
-            <!-- <marquee><img src="images/m.jpeg" width="250" class="simg"></marquee> -->
-            <!-- <img src="images/c7.jpeg" width="150" class="simg"> -->
+            <marquee><img src="images/m.jpeg" width="250" class="simg"></marquee>
+            <img src="images/c7.jpeg" width="150" class="simg">
         </div>
-    </div>
+    </div> -->
 
-    <div class="wrapper" id="poll" style="justify-content: center; display:none;">
+    <div class="wrapper" id="poll" style="justify-content: center;"><!-- display:none;">-->
         <div class="ps" id="post">
             <h2>SRC</h2>
-            <h2>Select Post To Vote</h2>
-            <div class="po">
-                <button onclick="FPre()">
-                    <div class="p"><img class="img" src="images/c4.jpeg" width="100" height="100">President</div>
-                </button>
-            </div>
-            <div class="po">
-                <button onclick="FGS()">
-                    <div class="p"><img class="img" src="images/c4.jpeg" width="100" height="100">General Secretary</div>
-                </button>
-            </div>
-            <div class="po">
-                <button id="FTre">
-                    <div class="p"><img class="img" src="images/c4.jpeg" width="100" height="100">Treasurer</div>
-                </button>
-            </div>
-            <div class="po">
-                <button onclick="FNUGSP()">
-                    <div class="p"><img  class="img" src="images/c4.jpeg" width="100" height="100">Local NUGS President</div>
-                </button>
-            </div>
-            <div class="po">
-                <button id="NUGS_S">
-                    <div class="p"><img  class="img" src="images/c4.jpeg" width="100" height="100">Local NUGS Secretary</div>
-                </button>
-            </div>
-            <div class="po">
-                <button id="NUGS_T">
-                    <div class="p"><img class="img" src="images/c4.jpeg" width="100" height="100">Local NUGS Treasurer</div>
-                </button>
-            </div>
-            <div class="po">
-                <button onclick="FWCom()">
-                    <div class="p"><img class="img" src="images/c4.jpeg" width="100" height="100">Womens Commissioner</div>
-                </button>
-            </div>
+            <h2>Positions</h2>
+            <?php
+                $i = 0;
+                $posts=get_post();
+                foreach($posts as $post){
+                    $Position = str_replace("_"," ",$post['POST']);
+                    echo<<<EOT
+                        <div class="po">
+                            <button id=$postButtonID[$i]>
+                                <div class="p"><img id=$postID[$i] class="img" src="images/c4.jpeg" width="100" height="100">$Position</div>
+                            </button>
+                        </div>
+                    EOT;
+                    $i++;
+                }
+            ?>
             <form action="func.php" method="post">
              <button class="submit" name="save_choice" style="width: 60px">Submit</button>
              <input type="hidden" name="array" id="array">
             </form>
         </div>
         
-        <div class="pv" id="Pre">
-            <div id="waterm" style="background-image: url('images/s1.jpeg');"></div>
-            <h2>President</h2>
-            <?php
-            sort_candidate('President');
-            ?>
-            <div class="po" id="President">
-                <button class="save-choice" id="President" onclick="go('President')">Save</button>
-                <?php save_C('President') ?>
-            </div>
-        </div>
-        <div class="pv" id="GS" style="display: none;">
-            <div id="waterm" style="background-image: url('images/s1.jpeg');"></div>
-            <h2>General Secretary</h2>
-            <?php
-            sort_candidate('General_Secretary');
-            ?>
-            <div class="po" id="General_Secretary">
-                <button class="save-choice" id="General_Secretary" onclick="go('General_Secretary')">Save</button>
-                <?php save_C('General_Secretary') ?>
-            </div>
-        </div>
-        <div class="pv" id="Tre" style="display: none;">
-            <div id="waterm" style="background-image: url('images/s1.jpeg');"></div>
-            <h2>Treasurer</h2>
-            <?php
-            sort_candidate('Treasurer');
-            ?>
-            <div class="po" id="Treasurer">
-                <button class="save-choice" id="Treasurer" onclick="go('Treasurer')">Save</button>
-                <?php save_C('Treasurer') ?>
-            </div>
-        </div>
-        <div class="pv" id="NUGSP" style="display: none;">
-            <div id="waterm" style="background-image: url('images/s1.jpeg');"></div>
-            <h2>NUGS President</h2>
-            <?php
-            sort_candidate('NUGS_President');
-            ?>
-            <div class="po" id="NUGS_President">
-                <button class="save-choice" id="NUGS_President" onclick="go('NUGS_President')">Save</button>
-                <?php save_C('NUGS_President') ?>
-            </div>
-        </div>
-        <div class="pv" id="NUGSS" style="display: none;">
-            <div id="waterm" style="background-image: url('images/s1.jpeg');"></div>
-            <h2>NUGS Secretary</h2>
-            <?php
-            sort_candidate('NUGS_Secretary');
-            ?>
-            <div class="po" id="NUGS_Secretary">
-                <button class="save-choice" id="NUGS_Secretary" onclick="go('NUGS_Secretary')">Save</button>
-                <?php save_C('NUGS_Secretary') ?>
-            </div>
-        </div>
-        <div class="pv" id="NUGST" style="display: none;">
-            <div id="waterm" style="background-image: url('images/s1.jpeg');"></div>
-            <h2>NUGS Secretary</h2>
-            <?php
-            sort_candidate('NUGS_Treasurer');
-            ?>
-            <div class="po" id="NUGS_Treasurer">
-                <button class="save-choice" id="NUGS_Treasurer" onclick="go('NUGS_Treasurer')">Save</button>
-                <?php save_C('NUGS_Treasurer') ?>
-            </div>
-        </div>
-        <div class="pv" id="WCom" style="display: none;">
-            <div id="waterm" style="background-image: url('images/s1.jpeg');"></div>
-            <h2>Womens Commissioner</h2>
-            <?php
-            sort_candidate('Womens_Commissioner');
-            ?>
-            <div class="po" id="Womens_Commissioner">
-                <button class="save-choice" id="Womens_Commissioner" onclick="go('Womens_Commissioner')">Save</button>
-                <?php save_C('Womens_Commissioner') ?>
-            </div>
-        </div>
+        <?php
+            $i = 0;
+            foreach($postContentID as $postContent){
+                if ($i == 0){
+                    $display="flex";
+                }else{
+                    $display="none";
+                }
+                echo <<<EOT
+                    <div class="pv" id= $postContent style="display: $display;">
+                        <div id="waterm" style="background-image: url('images/s1.jpeg');"></div>
+                        <h2>$DPost[$i]</h2> 
+                EOT;
+                        sort_candidate($Post[$i]);
+                echo <<<EOT
+                        <div class="po" id=$Post[$i]>
+                            <button class="save-choice" id=$Post[$i] onclick="go('$Post[$i]')">Save</button>
+                EOT;
+                            save_C($Post[$i]);
+                echo <<<EOT
+                        </div>
+                    </div>
+                EOT;
+                $i++;
+            }
+        ?>
+        
     </div>
     <script src="nav.js"></script>
     <?php

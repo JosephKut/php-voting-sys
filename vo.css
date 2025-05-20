@@ -195,6 +195,10 @@ a:hover{
     z-index: 2;
 }
 
+.po button{
+    border: none;
+}
+
 .vo{
     display: flex;
     margin: 15px;
@@ -308,20 +312,41 @@ button:hover{
         padding: 10px;
     }
      h2{
-        width: 60;
+        width: 100%;
         height: 60;
     }
     .po input{
         margin-left: 50px;
     }
-    .pimg{
-        width: 60;
-        height: 60;
+    .p img {
+        width: 85;
+        height: 85;
     }
     .p{
         background: linear-gradient(to bottom,#e2e2e2,#65f578);
         border: transparent;
         border-radius: 5%;
+    }
+    .pv{
+        width: 60%;
+    }
+}
+
+@media only screen and (max-width:500px){
+    .ps{
+        width: 30%;
+    }
+}
+
+@media only screen and (max-width:430px){
+    .ps{
+        width: 35%;
+    }
+}
+
+@media only screen and (max-width:380px){
+    .ps h2 {
+        font-size: larger;
     }
 }
 

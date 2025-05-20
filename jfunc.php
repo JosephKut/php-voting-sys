@@ -20,8 +20,8 @@ function validate_link($token,$time,$hash,$mail,$un){
 
 function get_post(){
     include 'connect.php';
-    $getPost="SELECT POST FROM post";
-    $format=$jconn->query($getPost);
+    $getPost="SELECT POST FROM jcr_post";
+    $format=$conn->query($getPost);
     $row=$format->fetch_assoc();
     foreach($format as $Pin){
         $list[]=$Pin;   
@@ -32,44 +32,45 @@ function get_post(){
 function j_get_no_of_voters(){
     include 'connect.php';
     $getVoters="SELECT * FROM voters";
-    $result=$con->query($getVoters);
+    $result=$conn->query($getVoters);
     $No_of_Voters=$result->num_rows;
     return $No_of_Voters;
 }
 
 function jget_no_of_links_sent(){
     include 'connect.php';
-    $getlinks="SELECT * FROM sent_links";
-    $result=$jconn->query($getlinks);
+    $getlinks="SELECT * FROM jcr_sent_links";
+    $result=$conn->query($getlinks);
     $No_of_links=$result->num_rows;
     return $No_of_links;
 }
 
 function j_get_no_of_votes(){
     include 'connect.php';
-    $getVotes="SELECT * FROM votes";
-    $result=$jconn->query($getVotes);
+    $getVotes="SELECT * FROM jcr_votes";
+    $result=$conn->query($getVotes);
     $No_of_Votes=$result->num_rows;
     return $No_of_Votes;
 }
 
 function sort_post(){
     include 'connect.php';
-    $getPost="SELECT * FROM post";
-    $result=$jconn->query($getPost);
+    $getPost="SELECT * FROM jcr_post";
+    $result=$conn->query($getPost);
     foreach($result as $Pin){
+        $Position = str_replace("_"," ",$Pin['Post']);
         echo <<<EOT
-        <option value=$Pin[Post]>$Pin[Post]</option>
+        <option value=$Pin[Post]>$Position</option>
         EOT;
     }
 }
 
 function sort_candidate($VP){
     include 'connect.php';
-    $getcandidates="SELECT * FROM candidate WHERE Post='$VP'";
-    $result=$jconn->query($getcandidates);
-    $getPost="SELECT * FROM post WHERE Post='$VP'";
-    $format=$jconn->query($getPost);
+    $getcandidates="SELECT * FROM jcr_candidate WHERE Post='$VP'";
+    $result=$conn->query($getcandidates);
+    $getPost="SELECT * FROM jcr_post WHERE Post='$VP'";
+    $format=$conn->query($getPost);
     $row=$format->fetch_assoc();
     $n=1;
     $N=2;
@@ -79,7 +80,7 @@ function sort_candidate($VP){
                 echo<<<EOT
                 <div class="po">
                     <div><img src=$Pin[Image] width="100" height="100">$Pin[Full_Name]</div>
-                    <input type="radio" name="choice" value=$n><input">
+                    <input type="radio" name="choice" value=$n$Pin[Image]><input">
                 </div>
                 EOT;
                 $n++;
@@ -115,8 +116,8 @@ function sort_candidate($VP){
 
 function save_C($VP){
     include 'connect.php';
-    $getcandidates="SELECT * FROM candidate WHERE Post='$VP'";
-    $result=$jconn->query($getcandidates);
+    $getcandidates="SELECT * FROM jcr_candidate WHERE Post='$VP'";
+    $result=$conn->query($getcandidates);
     if (!$result->num_rows>0){
         echo<<<EOT
         <script>
@@ -131,17 +132,17 @@ if (isset($_POST['jsave_choice'])){
     foreach($array as $choice){
         $ch = ucwords($choice[0]);
         $table_check="SHOW TABLES LIKE '$ch'";
-        $table=$jconn->query($table_check);
+        $table=$conn->query($table_check);
 
-        $getcandidates="SELECT * FROM candidate WHERE Post='$ch'";
-        $can=$jconn->query($getcandidates);
+        $getcandidates="SELECT * FROM jcr_candidate WHERE Post='$ch'";
+        $can=$conn->query($getcandidates);
         $i = 0;
         if ($table->num_rows>0){
             if (strchr($choice[1],"@")){
                 list($name,$ans) = explode("@",$choice[1]);
                 $insertQuery="INSERT INTO $choice[0] (Candidate,Votes)
                 VALUE('$name','$ans')";
-                $jconn->query($insertQuery);
+                $conn->query($insertQuery);
             }else{
                 while ($i < $choice[1]){
                     $canC = $can->fetch_assoc();
@@ -149,19 +150,19 @@ if (isset($_POST['jsave_choice'])){
                 }
                 $insertQuery="INSERT INTO $choice[0] (Candidate,Votes)
                 VALUE('$canC[Full_Name]','$choice[1]')";
-                $jconn->query($insertQuery);
+                $conn->query($insertQuery);
             }
         }
         else{
             $create_table="CREATE TABLE $choice[0](
                 Candidate VARCHAR(50) NOT NULL,
                 Votes VARCHAR(50) NOT NULL)";
-            $jconn->query($create_table);
+            $conn->query($create_table);
             if (strchr($choice[1],"@")){
                 list($name,$ans) = explode("@",$choice[1]);
                 $insertQuery="INSERT INTO $choice[0] (Candidate,Votes)
                 VALUE('$name','$ans')";
-                $jconn->query($insertQuery);
+                $conn->query($insertQuery);
             }else{
                 while ($i < $choice[1]){
                     $canC = $can->fetch_assoc();
@@ -169,32 +170,29 @@ if (isset($_POST['jsave_choice'])){
                 }
                 $insertQuery="INSERT INTO $choice[0] (Candidate,Votes)
                 VALUE('$canC[Full_Name]','$choice[1]')";
-                $jconn->query($insertQuery);
+                $conn->query($insertQuery);
             }
             }
         }
         session_start();
         echo $_SESSION['index'];
-        $insertQ="INSERT INTO votes (Student_Email,Unique_Code)
+        $insertQ="INSERT INTO jcr_votes (Student_Email,Unique_Code)
                 VALUE('$_SESSION[Student_Email]','$_SESSION[Unique_Code]')";
-        $jconn->query($insertQ);
+        $conn->query($insertQ);
         header("location: success.php");
 
-        $sender="umat-srid";
-        $Smail="josephkuttor730@gmail.com";
-        $to = "$_SESSION[Student_Email]";
-        $subject = "UMAT JCR";
+        $To = "$_SESSION[Student_Email]";
+        $From = 'umat-srid';
+        $Subject = 'UMAT JCR';
+        $SuccessMsg = "sent";
+        $FailedMsg = "failed";
 
-        $mail->setFrom($Smail,$sender);
-        $mail->addAddress($to);
-
-        $mail->Subject = $subject;
-        $mail->Body ="<p>Your vote has being cast and received successfully.</p>
+        $Body ="<p>Your vote has being cast and received successfully.</p>
                         <h3>Vote Successful</h3>";
         
-        $mail->isHTML(true);
+        include 'mailer.php';
 
-        if($mail->send()) {
+        if($sent) {
             echo <<<EOT
             <script>
                 alert "You would receive an email as a prove of a successful vote!";
@@ -206,10 +204,10 @@ if (isset($_POST['jsave_choice'])){
     //checks if session has started or voter has voted
     function check(){
         include 'connect.php';
-        $check_if_voted="SELECT * FROM votes WHERE Student_Email='$_SESSION[Student_Email]'";
-        $checked=$jconn->query($check_if_voted);
-        $get_s="SELECT * FROM session";
-        $session=$jconn->query($get_s);
+        $check_if_voted="SELECT * FROM jcr_votes WHERE Student_Email='$_SESSION[Student_Email]'";
+        $checked=$conn->query($check_if_voted);
+        $get_s="SELECT * FROM jcr_session";
+        $session=$conn->query($get_s);
         $ses=$session->fetch_assoc();
         if ($ses['session']=='stop'){
             include 'ses.stop.php';
@@ -226,54 +224,55 @@ if (isset($_POST['jsave_choice'])){
 
     function display_post(){
         include 'connect.php';
-        $getPost="SELECT * FROM post";
-        $result=$jconn->query($getPost);
+        $getPost="SELECT * FROM jcr_post";
+        $result=$conn->query($getPost);
         //$n=1;
         foreach($result as $Pn){
-            $get_Cand="SELECT * FROM candidate WHERE Post='$Pn[Post]'";
-            $sult=$jconn->query($get_Cand);
-            echo "
-            <table>
-                <tr>
-                    <th colspan='5'>$Pn[Post]</th>
-                </tr>
-                <tr>
-                    <th>Index No</th>
-                    <th>Name</th>
-                    <th>Reference No</th>
-                    <th>Image</th>
-                </tr>";
-            foreach($sult as $Pin){
-            echo "
-            <tr>
-                <td>$Pin[Index_No]</td>
-                <td>$Pin[Full_Name]</td>
-                <td>$Pin[Reference_No]</td>
-                <!--<td>$Pin[Post]</td>-->
-                <td><img src=$Pin[Image] style='width:100px; height:100px;'></td>
-            </tr>";
+            $get_Cand="SELECT * FROM jcr_candidate WHERE Post='$Pn[Post]'";
+            $sult=$conn->query($get_Cand);
+            if ($sult->num_rows > 0){
+                echo "
+                <div style='background: rgba(225, 225, 225, 0.15); width: 80%; margin:2% 10%; justify-content: left; align-items: center; border-radius:5px;'>
+                    <h3 style='color: #ddc918; margin-top:2%'>$Pn[Post]</h3>
+                ";
+                foreach($sult as $Pin){
+                echo "
+                <div style='width: 80%; margin:2% 15% 0 15%; display:flex; justify-content: left; align-items: center;'>
+                    <div style='margin:2%;'>
+                        <img src=$Pin[Image] style='width:100px; height:100px; border-radius:5px;'>
+                    </div>
+                    <div style=''>
+                        <h3>$Pin[Full_Name]</h3>
+                        <h4>$Pin[Index_No]</h4>
+                        <!--<td>$Pin[Reference_No]</td>-->
+                        <!--<td>$Pin[Post]</td>-->
+                    </div>
+                </div>";
+                }
+                echo "</div>";
+            }
         }
-        echo "</table>";}
     }
 
     function sort_result($VP){
         include 'connect.php';
         $table_check="SHOW TABLES LIKE '$VP'";
-        $table=$jconn->query($table_check);
+        $table=$conn->query($table_check);
         if ($table->num_rows>0){
-            $getcandidates="SELECT * FROM candidate WHERE Post='$VP'";
-            $result=$jconn->query($getcandidates);
-            $getPost="SELECT * FROM post WHERE Post='$VP'";
-            $format=$jconn->query($getPost);
+            $getcandidates="SELECT * FROM jcr_candidate WHERE Post='$VP'";
+            $result=$conn->query($getcandidates);
+            $getPost="SELECT * FROM jcr_post WHERE Post='$VP'";
+            $format=$conn->query($getPost);
             $row=$format->fetch_assoc();
             $n=1;
             $N=2;
-            echo"<br><h2 align='center'>$VP</h2><br>";
 
             if ("Multi-Voting"==$row['Type']){
+                $v= str_replace("_"," ",$VP);
+                echo"<br><h2 align='center' style='border-bottom: none;'>$v</h2><br>";
                 foreach($result as $Pin){
                     $getresult="SELECT * FROM $VP WHERE Candidate='$Pin[Full_Name]'";
-                    $poll=$jconn->query($getresult);
+                    $poll=$conn->query($getresult);
                     $pollC=$poll->num_rows;
                     echo<<<EOT
                     <div class="po">
@@ -287,12 +286,14 @@ if (isset($_POST['jsave_choice'])){
                 }
             }
             elseif ("Referendum"==$row['Type']) {
+                $v= str_replace("_"," ",$VP);
+                echo"<br><h2 align='center' style='border-bottom: none;'>$v</h2><br>";
                 foreach($result as $Pin){
                     $getresult="SELECT * FROM $VP WHERE Candidate='$Pin[Full_Name]' AND Votes='1'";
-                    $poll=$jconn->query($getresult);
+                    $poll=$conn->query($getresult);
                     $pollC=$poll->num_rows;
                     $getresult2="SELECT * FROM $VP WHERE Candidate='$Pin[Full_Name]' AND Votes='2'";
-                    $poll2=$jconn->query($getresult2);
+                    $poll2=$conn->query($getresult2);
                     $pollC2=$poll2->num_rows;
                     echo <<<EOT
                     <div class="po">
@@ -309,7 +310,8 @@ if (isset($_POST['jsave_choice'])){
                 }
             }
         }else{
-            echo "<br><h2 align='center'>$VP</h2><br>
+            $v= str_replace("_"," ",$VP);
+            echo"<br><h2 align='center' style='border-bottom: none;'>$v</h2><br>
             <h5 align='center'>No results yet!!!</h5><br>";}
     }
 ?>
@@ -317,12 +319,16 @@ if (isset($_POST['jsave_choice'])){
 <script>
     var list = [];
     function go(post){
-    $p=post;
-    const c =document.querySelector('input[name="choice"]:checked').value;
-    let new_choice = [post,c];
-    list.push(new_choice);
-    console.log(list);
-    save(post);
+        console.log(post);
+        const c =document.querySelector('input[name="choice"]:checked').value;
+        document.getElementById("j"+post).src = c.slice(1);
+        let new_choice = [post,c[0]]; 
+        if (!c.include("@")){
+            let new_choice = [post,c];
+        }
+        list.push(new_choice);
+        //console.log("j"+$p);
+        save(post);
     }
 
     function save(post){

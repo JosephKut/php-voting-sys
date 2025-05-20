@@ -10,9 +10,9 @@
     <script src="canvasjs.min.js"></script>
     <div class="wrapper" style="flex-direction: column;"> 
         <div class="content" style="height: 100%;">
-            <div id="h" style="margin:1%;">
+            <!-- <div id="h" style="margin:1%;">
                 <img src="images/u9.PNG">
-            </div>    
+            </div>     -->
             <h1>SRC RESULT CHART</h1>
             <?php
             function sort_resut($VP){

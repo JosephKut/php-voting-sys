@@ -1,18 +1,4 @@
 <?php
-require "vendor/autoload.php";
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\SMTP;
-$mail = new PHPMailer(true);
-
-$mail->isSMTP();
-$mail->SMTPAuth = true;
-
-$mail->Host = 'smtp.gmail.com';
-$mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-$mail->Port = 587;
-
-$mail->Username = "josephkuttor730@gmail.com";
-$mail->Password = "ooupcvqmnwkzwjfn";
 
 include 'connect.php';
 // session_start();
@@ -35,7 +21,7 @@ function validate_link($token,$time,$hash,$mail,$un){
 
 function get_post(){
     include 'connect.php';
-    $getPost="SELECT POST FROM post";
+    $getPost="SELECT POST FROM src_post";
     $format=$conn->query($getPost);
     $row=$format->fetch_assoc();
     foreach($format as $Pin){
@@ -47,14 +33,14 @@ function get_post(){
 function get_no_of_voters(){
     include 'connect.php';
     $getVoters="SELECT * FROM voters";
-    $result=$con->query($getVoters);
+    $result=$conn->query($getVoters);
     $No_of_Voters=$result->num_rows;
     return $No_of_Voters;
 }
 
 function get_no_of_links_sent(){
     include 'connect.php';
-    $getlinks="SELECT * FROM sent_links";
+    $getlinks="SELECT * FROM src_sent_links";
     $result=$conn->query($getlinks);
     $No_of_links=$result->num_rows;
     return $No_of_links;
@@ -62,7 +48,7 @@ function get_no_of_links_sent(){
 
 function get_no_of_votes(){
     include 'connect.php';
-    $getVotes="SELECT * FROM votes";
+    $getVotes="SELECT * FROM src_votes";
     $result=$conn->query($getVotes);
     $No_of_Votes=$result->num_rows;
     return $No_of_Votes;
@@ -70,41 +56,41 @@ function get_no_of_votes(){
 
 function display_post(){
     include 'connect.php';
-    $getPost="SELECT * FROM post";
+    $getPost="SELECT * FROM src_post";
     $result=$conn->query($getPost);
     //$n=1;
     foreach($result as $Pn){
-        $get_Cand="SELECT * FROM candidate WHERE Post='$Pn[Post]'";
+        $get_Cand="SELECT * FROM src_candidate WHERE Post='$Pn[Post]'";
         $sult=$conn->query($get_Cand);
-        echo "
-        <table>
-            <tr>
-                <th colspan='5'>$Pn[Post]</th>
-            </tr>
-            <tr>
-                <th>Index No</th>
-                <th>Name</th>
-                <th>Reference No</th>
-                <th>Image</th>
-            </tr>";
-        foreach($sult as $Pin){
-        echo "
-        <tr>
-            <td>$Pin[Index_No]</td>
-            <td>$Pin[Full_Name]</td>
-            <td>$Pin[Reference_No]</td>
-            <!--<td>$Pin[Post]</td>-->
-            <td><img src=$Pin[Image] style='width:100px; height:100px;'></td>
-        </tr>";
+        if ($sult->num_rows > 0){
+            echo "
+            <div style='background: rgba(225, 225, 225, 0.15); width: 80%; margin:2% 10%; justify-content: left; align-items: center; border-radius:5px;'>
+                <h3 style='color: #ddc918; margin-top:2%'>$Pn[Post]</h3>
+            ";
+            foreach($sult as $Pin){
+            echo "
+            <div style='width: 80%; margin:2% 15% 0 15%; display:flex; justify-content: left; align-items: center;'>
+                <div style='margin:2%;'>
+                    <img src=$Pin[Image] style='width:100px; height:100px; border-radius:5px;'>
+                </div>
+                <div style=''>
+                    <h3>$Pin[Full_Name]</h3>
+                    <h4>$Pin[Index_No]</h4>
+                    <!--<td>$Pin[Reference_No]</td>-->
+                    <!--<td>$Pin[Post]</td>-->
+                </div>
+            </div>";
+            }
+            echo "</div>";
+        }
     }
-    echo "</table>";}
 }
 
 function sort_candidate($VP){
     include 'connect.php';
-    $getcandidates="SELECT * FROM candidate WHERE Post='$VP'";
+    $getcandidates="SELECT * FROM src_candidate WHERE Post='$VP'";
     $result=$conn->query($getcandidates);
-    $getPost="SELECT * FROM post WHERE Post='$VP'";
+    $getPost="SELECT * FROM src_post WHERE Post='$VP'";
     $format=$conn->query($getPost);
     $row=$format->fetch_assoc();
     $n=1;
@@ -115,7 +101,7 @@ function sort_candidate($VP){
                 echo<<<EOT
                 <div class="po">
                     <div><img src=$Pin[Image] width="100" height="100">$Pin[Full_Name]</div>
-                    <input type="radio" name="choice" value=$n>
+                    <input type="radio" name="choice" value=$n$Pin[Image]>
                 </div>
                 EOT;
                 $n++;
@@ -151,7 +137,7 @@ function sort_candidate($VP){
 
 function save_C($VP){
     include 'connect.php';
-    $getcandidates="SELECT * FROM candidate WHERE Post='$VP'";
+    $getcandidates="SELECT * FROM src_candidate WHERE Post='$VP'";
     $result=$conn->query($getcandidates);
     if (!$result->num_rows>0){
         echo<<<EOT
@@ -163,11 +149,12 @@ function save_C($VP){
 
 function sort_post(){
     include 'connect.php';
-    $getPost="SELECT * FROM post";
+    $getPost="SELECT * FROM src_post";
     $result=$conn->query($getPost);
     foreach($result as $Pin){
+        $Position = str_replace("_"," ",$Pin['Post']);
         echo <<<EOT
-        <option value=$Pin[Post]>$Pin[Post]</option>
+        <option value=$Pin[Post]>$Position</option>
         EOT;
     }
 }
@@ -180,7 +167,7 @@ if (isset($_POST['save_choice'])){
         $table_check="SHOW TABLES LIKE '$ch'";
         $table=$conn->query($table_check);
 
-        $getcandidates="SELECT * FROM candidate WHERE Post='$ch'";
+        $getcandidates="SELECT * FROM src_candidate WHERE Post='$ch'";
         $can=$conn->query($getcandidates);
         $i = 0;
         if ($table->num_rows>0){
@@ -222,26 +209,22 @@ if (isset($_POST['save_choice'])){
         }
         session_start();
         echo $_SESSION['index'];
-        $insertQ="INSERT INTO votes (Student_Email,Unique_Code)
+        $insertQ="INSERT INTO src_votes (Student_Email,Unique_Code)
                 VALUE('$_SESSION[Student_Email]','$_SESSION[Unique_Code]')";
         $conn->query($insertQ);
         header("location: success.php");
 
         $sender="umat-srid";
-        $Smail="josephkuttor730@gmail.com";
-        $to = "$_SESSION[Student_Email]";
-        $subject = "UMAT SRC";
+        $To = "$_SESSION[Student_Email]";
+        $From = 'umat-srid';
+        $Subject = 'UMAT SRC';
+        $SuccessMsg = "sent";
+        $FailedMsg = "failed";
 
-        $mail->setFrom($Smail,$sender);
-        $mail->addAddress($to);
-
-        $mail->Subject = $subject;
-        $mail->Body ="<p>Your vote has being cast and received successfully.</p>
+        $Body ="<p>Your vote has being cast and received successfully.</p>
                         <h3>Vote Successful</h3>";
         
-        $mail->isHTML(true);
-
-        if($mail->send()) {
+        if($sent) {
             echo <<<EOT
             <script>
                 alert "You would receive an email as a prove of a successful vote!";
@@ -257,9 +240,9 @@ if (isset($_POST['save_choice'])){
     function check(){
         //session_start();
         include 'connect.php';
-        $check_if_voted="SELECT * FROM votes WHERE Student_Email='$_SESSION[Student_Email]'";
+        $check_if_voted="SELECT * FROM src_votes WHERE Student_Email='$_SESSION[Student_Email]'";
         $checked=$conn->query($check_if_voted);
-        $get_s="SELECT * FROM session";
+        $get_s="SELECT * FROM src_session";
         $session=$conn->query($get_s);
         $ses=$session->fetch_assoc();
         if ($ses['session']=='stop'){
@@ -280,16 +263,17 @@ if (isset($_POST['save_choice'])){
         $table_check="SHOW TABLES LIKE '$VP'";
         $table=$conn->query($table_check);
         if ($table->num_rows>0){
-            $getcandidates="SELECT * FROM candidate WHERE Post='$VP'";
+            $getcandidates="SELECT * FROM src_candidate WHERE Post='$VP'";
             $result=$conn->query($getcandidates);
-            $getPost="SELECT * FROM post WHERE Post='$VP'";
+            $getPost="SELECT * FROM src_post WHERE Post='$VP'";
             $format=$conn->query($getPost);
             $row=$format->fetch_assoc();
             $n=1;
             $N=2;
-            echo"<br><h2 align='center'>$VP</h2><br>";
 
             if ("Multi-Voting"==$row['Type']){
+                $v= str_replace("_"," ",$VP);
+                echo"<br><h2 align='center' style='border-bottom: none;'>$v</h2><br>";
                 foreach($result as $Pin){
                     $getresult="SELECT * FROM $VP WHERE Candidate='$Pin[Full_Name]'";
                     $poll=$conn->query($getresult);
@@ -306,6 +290,8 @@ if (isset($_POST['save_choice'])){
                 }
             }
             elseif ("Referendum"==$row['Type']) {
+                $v= str_replace("_"," ",$VP);
+                echo"<br><h2 align='center' style='border-bottom: none;'>$v</h2><br>";
                 foreach($result as $Pin){
                     $getresult="SELECT * FROM $VP WHERE Candidate='$Pin[Full_Name]' AND Votes='1'";
                     $poll=$conn->query($getresult);
@@ -328,7 +314,8 @@ if (isset($_POST['save_choice'])){
                 }
             }
         }else{
-            echo "<br><h2 align='center'>$VP</h2><br>
+            $v= str_replace("_"," ",$VP);
+            echo"<br><h2 align='center' style='border-bottom: none;'>$v</h2><br>
             <h5 align='center'>No results yet!!!</h5><br>";}
     }
 
@@ -340,12 +327,15 @@ if (isset($_POST['save_choice'])){
 <script>
     var list = [];
     function go(post){
-    $p=post;
-    const c =document.querySelector('input[name="choice"]:checked').value;
-    let new_choice = [post,c];
-    list.push(new_choice);
-    console.log(list);
-    save(post);
+        const c =document.querySelector('input[name="choice"]:checked').value;
+        let new_choice = [post,c];
+        if (!c.include("@")){
+            document.getElementById("s"+post).src = c.slice(1);
+            let new_choice = [post,c[0]];    
+        }
+        list.push(new_choice);
+        console.log(list);
+        save(post);
     }
 
     function save(post){

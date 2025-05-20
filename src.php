@@ -1,18 +1,4 @@
 <?php
-require "vendor/autoload.php";
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\SMTP;
-$mail = new PHPMailer(true);
-
-$mail->isSMTP();
-$mail->SMTPAuth = true;
-
-$mail->Host = 'smtp.gmail.com';
-$mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-$mail->Port = 587;
-
-$mail->Username = "josephkuttor730@gmail.com";
-$mail->Password = "ooupcvqmnwkzwjfn";
 
 include 'connect.php';
 //include("func.php");
@@ -61,7 +47,7 @@ SCHOOL OF RAILWAY AND INFRUSTRACTURE DEVELOPMENT',1,);
 
     function get_post(){
         include 'connect.php';
-        $getPost="SELECT POST FROM post";
+        $getPost="SELECT POST FROM src_post";
         $format=$conn->query($getPost);
         $row=$format->fetch_assoc();
         foreach($format as $Pin){
@@ -82,9 +68,9 @@ SCHOOL OF RAILWAY AND INFRUSTRACTURE DEVELOPMENT',1,);
             $pdf->Cell(50, 10, 'PASSPORT', 0, 0, 'C');
             $pdf->Cell(80, 10, 'NAME', 0, 0, 'C');
             $pdf->Cell(50, 10, 'RESULT:  Fig.         Per      ', 0, 1, 'C');
-            $getcandidates="SELECT * FROM candidate WHERE Post='$VP'";
+            $getcandidates="SELECT * FROM src_candidate WHERE Post='$VP'";
             $result=$conn->query($getcandidates);
-            $getPost="SELECT * FROM post WHERE Post='$VP'";
+            $getPost="SELECT * FROM src_post WHERE Post='$VP'";
             $format=$conn->query($getPost);
             $row=$format->fetch_assoc();
             $n=1;
@@ -142,7 +128,7 @@ No:        '.$pollC2.'        '.number_format(($pollC2/$No_votes)*100,2).'%', 0,
     // $pdf->Ln();
 
     $pdf->Cell(0, 10, "EC STATEMENT", 0, 1, 'C');
-        $select="SELECT * FROM ec_statement";
+        $select="SELECT * FROM src_ec_statement";
         $sel=$conn->query($select);
         foreach ($sel as $info){
             if (!empty($info['Title'])){
@@ -164,14 +150,16 @@ if (isset($_POST['verify'])){
     $expected_otp = $_POST['otp1'].$_POST['otp2'].$_POST['otp3'].$_POST['otp4'];
     if ($_SESSION['otp']==$expected_otp){
         include 'connect.php';
-        $getPost="SELECT POST FROM post";
+        $getPost="SELECT POST FROM src_post";
         $format=$conn->query($getPost);
 
-        $conn->query("DELETE FROM votes");
-        $conn->query("DELETE FROM candidate");
-        $conn->query("DELETE FROM ec_statement");
-        $conn->query("DELETE FROM feedback");
-        $conn->query("DELETE FROM nb");
+        $conn->query("DELETE FROM src_votes");
+        $conn->query("DELETE FROM src_candidate");
+        $conn->query("DELETE FROM src_ec_statement");
+        $conn->query("DELETE FROM src_feedback");
+        $conn->query("DELETE FROM src_nb");
+        $conn->query("DELETE FROM src_sent_links");
+        
 
         foreach($format as $Pin){
             $list[]=$Pin;   
@@ -247,16 +235,16 @@ if (isset($_POST['verify'])){
 //Add posts to database
 if (isset($_POST['addP'])){
     //$postId=$_POST['postId'];
-    $postName=$_POST['postName'];
+    $postName= str_replace(" ","_", str_trim($_POST['postName']));
     $postType=$_POST['postType'];
 
-    $checkPost="SELECT * FROM post where Post='$postName'";
+    $checkPost="SELECT * FROM src_post where Post='$postName'";
     $result=$conn->query($checkPost);
     if($result->num_rows>0){
         echo "<script>alert ('Post Already Exist!')</script>";
     }
     else{
-        $insertQuery="INSERT INTO post(Post,Type)
+        $insertQuery="INSERT INTO src_post(Post,Type)
         VALUES('$postName','$postType')";
 
         if($conn->query($insertQuery)==True){
@@ -275,7 +263,7 @@ if (isset($_POST['editP'])){
     $postType=$_POST['postType'];
     $selector=$_POST['selector'];
 
-    $updateC="UPDATE post SET Post='$postName', Type='$postType' WHERE Post_id='$selector'";
+    $updateC="UPDATE src_post SET Post='$postName', Type='$postType' WHERE Post_id='$selector'";
     $save=$conn->query($updateC);
     if ($save){
         header("location: ad.src.php?Login=success");
@@ -286,7 +274,7 @@ if (isset($_POST['editP'])){
 
 if (isset($_POST['deletP'])){
     $selector=$_POST['selector'];
-        $deleteC="DELETE FROM post WHERE Post_id='$selector'";
+        $deleteC="DELETE FROM src_post WHERE Post_id='$selector'";
         $del=$conn->query($deleteC);
         if ($del){
             header("location: ad.src.php?Login=success");
@@ -310,7 +298,7 @@ if (isset($_POST['addC'])){
     $upload_dir="uploads/";
     $image_path=$upload_dir . $image_name;
 
-    $checkPost="SELECT * FROM candidate where Full_name='$Cname' or Index_No='$Cindex' or Reference_No='$Creference'";
+    $checkPost="SELECT * FROM src_candidate where Full_name='$Cname' or Index_No='$Cindex' or Reference_No='$Creference'";
     $result=$conn->query($checkPost);
     if($result->num_rows>0){
         echo "<script>alert ('Candidate Already Exist!')</script>";
@@ -319,7 +307,7 @@ if (isset($_POST['addC'])){
     else{
         if(in_array($image_type,$allowedext)){
             move_uploaded_file($image_tmp,$image_path);
-            $insertQuery="INSERT INTO candidate(Index_No,Full_Name,Reference_No,Post,Image)
+            $insertQuery="INSERT INTO src_candidate(Index_No,Full_Name,Reference_No,Post,Image)
             VALUES('$Cindex','$Cname','$Creference','$post','$image_path')";
 
             if($conn->query($insertQuery)==True){
@@ -358,7 +346,7 @@ if (isset($_POST['editC'])){
 
     if(in_array($image_type,$allowedext)){
         move_uploaded_file($image_tmp,$image_path);
-        $updateC="UPDATE candidate SET Index_No='$Cindex',Full_Name='$Cname',Reference_No='$Creference',Post='$post',Image='$image_path' WHERE Index_No='$selector'";
+        $updateC="UPDATE src_candidate SET Index_No='$Cindex',Full_Name='$Cname',Reference_No='$Creference',Post='$post',Image='$image_path' WHERE Index_No='$selector'";
         $save=$conn->query($updateC);
         if ($save){
             header("location: ad.src.php?Login=success");
@@ -373,7 +361,7 @@ if (isset($_POST['editC'])){
 
 if (isset($_POST['deletC'])){
     $selector=$_POST['selector'];
-        $deleteC="DELETE FROM candidate WHERE Index_No='$selector'";
+        $deleteC="DELETE FROM src_candidate WHERE Index_No='$selector'";
         $del=$conn->query($deleteC);
         if ($del){
             header("location: ad.src.php?Login=success");
@@ -403,7 +391,7 @@ if (isset($_POST['deletC'])){
             $file_path=$upload_dir . $file_name;
 
             move_uploaded_file($file_tmp,$file_path);
-            $insertQuery="INSERT INTO nb (Message,File)
+            $insertQuery="INSERT INTO src_nb (Message,File)
             VALUES('$msg','$file_path')";
 
             if($conn->query($insertQuery)==True){
@@ -429,7 +417,7 @@ if (isset($_POST['deletC'])){
         $file_path=$upload_dir . $file_name;
 
         move_uploaded_file($file_tmp,$file_path);
-        $updateC="UPDATE nb SET Message='$msg',File='$$file_path' WHERE SN='$selector'";
+        $updateC="UPDATE src_nb SET Message='$msg',File='$$file_path' WHERE SN='$selector'";
         $save=$conn->query($updateC);
             if ($save){
                 echo "<script>alert ('Saved')</script>";
@@ -463,46 +451,43 @@ if (isset($_POST['deletC'])){
     
     if (isset($_POST['sst'])){
 
-        $table_check="SHOW TABLES LIKE 'session'";
+        $table_check="SHOW TABLES LIKE 'src_session'";
         $table=$conn->query($table_check);
         if ($table->num_rows>0){
             $insert="UPDATE session SET session='start' WHERE session='start' OR session='stop'";   
 
                     $sql="SELECT Student_Email FROM voters";
-                    $result=$con->query($sql);
+                    $result=$conn->query($sql);
                     $email=array();
                     while ($row=$result->fetch_assoc()) {
                         array_push($email,$row['Student_Email']);
-                    }        
-                    $sender="umat-srid";
-                    $Smail="josephkuttor730@gmail.com";
-                    $subject = "UMAT SRC";
+                    }
 
-                    foreach ($email as $to) {
+                    $From = 'umat-srid';
+                    $Subject = 'UMAT SRC';
+                    $SuccessMsg = "sent";
+                    $FailedMsg = "failed";
+
+                    foreach ($email as $To) {
                     
                         $msg=random_int(1000,9999);
                         $key="SRID.SRC.".$msg;
 
-                        $_SESSION['slink']=get_temp_link($to,$key);
-                            
-                        $mail->setFrom($Smail,$sender);
-                        $mail->addAddress($to);
-
+                        $_SESSION['slink']=get_temp_link($To,$key);
                         $link=substr( $_SESSION['slink'],0,20);
 
-                        $mail->Subject = $subject;
-                        $mail->Body ="<p>Click on this link: <a href='$_SESSION[slink]'> SRC Poll </a> to take part in the SRC election.</p>
+                        $Body = "<p>Click on this link: <a href='$_SESSION[slink]'> SRC Poll </a> to take part in the SRC election.</p>
                         <p>This ' $key '  would be your unique code for the election.</p>
                         <p>Use your student email account and the unique code to login and cast your vote.</p>
                         <p>You would receive an email after done voting to affirm your vote has been cast successfully.</p>";
-                        
-                        $mail->isHTML(true);
 
-                        $sql="SELECT * FROM sent_links WHERE Student_Email='$to'";
+                        include 'mailer.php';
+
+                        $sql="SELECT * FROM src_sent_links WHERE Student_Email='$To'";
                         $result=$conn->query($sql);
                         if(!$result->num_rows>0){
 
-                            if($mail->send()) {
+                            if($sent) {
                                 $conn->query($insert);
                                 echo "Mail successful!";
                                 $insertQuery="INSERT INTO sent_links(Student_Email,Link_Sent)
@@ -524,14 +509,14 @@ if (isset($_POST['deletC'])){
     }
 
     if (isset($_POST['ssp'])){
-        $table_check="SHOW TABLES LIKE 'session'";
+        $table_check="SHOW TABLES LIKE 'src_session'";
         $table=$conn->query($table_check);
         if ($table->num_rows>0){
-            $insert="UPDATE session SET session='stop' WHERE session='start' OR session='stop'";
+            $insert="UPDATE src_session SET session='stop' WHERE session='start' OR session='stop'";
             $conn->query($insert);
             header("location: ad.src.php?Login=success");
         }else{
-            $create_table="CREATE TABLE session(
+            $create_table="CREATE TABLE src_session(
                 session VARCHAR(5) NOT NULL)";
             $conn->query($create_table);
         }

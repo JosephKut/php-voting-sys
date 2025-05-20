@@ -5,10 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="log.css">
     <title>AD Login</title>
+    <style>
+    </style>
 </head>
 <body>
     <ul>
-        <li><img src="images/u9.PNG"></li>
+        <li></li>
+        <!-- <li><img src="images/u9.PNG"></li> -->
     </ul>
     <div class="login-wrapper" id="log-flex">
         <form method="post" action="ad.authentication.php">

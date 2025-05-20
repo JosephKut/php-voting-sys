@@ -24,7 +24,7 @@ if (isset($_POST['submit'])){
         $i=random_int(1,10000);
         $s_no = "ad.srid.".$i;
         $checkid="SELECT * FROM admin where Unique_No='$s_no'";
-        $result=$con->query($checkid);
+        $result=$conn->query($checkid);
         while ($result->num_rows>0){
             id();
         }
@@ -50,13 +50,13 @@ if (isset($_POST['submit'])){
             echo "<script>alert ('Image Type Invalid!')</script>";
         }
 
-        if($con->query($insertQuery)==True){
+        if($conn->query($insertQuery)==True){
             echo "<script>alert('Unique Number is $Unique_No')</script>";
             header("location: ad.reg.php");
 
         }
         else{
-            echo "Error:".$con->error;
+            echo "Error:".$conn->error;
         }
     }
 }
@@ -64,7 +64,7 @@ if (isset($_POST['submit'])){
 if (isset($_POST['ad_delete'])){
     $selector=$_POST['select'];
         $deleteC="DELETE FROM admin WHERE Unique_No='$selector'";
-        $del=$con->query($deleteC);
+        $del=$conn->query($deleteC);
         if ($del){
             header("location: ad.reg.php");
             echo "<script>alert ('Deletion Sucessfull');</script>";
@@ -75,7 +75,7 @@ if (isset ($_POST['login'])){
     $mail=$_POST['mail'];
     $unique=$_POST['un'];
     $sql="SELECT * FROM admin WHERE Unique_No='$unique' and Email='$mail'";
-    $result=$con->query($sql);
+    $result=$conn->query($sql);
         if($result->num_rows>0){
             session_start();
             $row=$result->fetch_assoc();

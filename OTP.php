@@ -1,58 +1,16 @@
 <?php
-
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\SMTP;
-require "vendor/autoload.php";
-
-$mail = new PHPMailer(true);
-
-$mail->isSMTP();
-$mail->SMTPAuth = true;
-
-$mail->Host = 'smtp.gmail.com';
-$mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-$mail->SMTPOptions = array(
-    'ssl' => array(
-        'verify_peer' => false,
-        'verify_peer_name' => false,
-        'allow_self_signed' => true
-    )
-);
-
-$mail->Port = 587;
-
-$mail->Username = 'josephkuttor730@gmail.com';
-$mail->Password = 'yqimujkasymkfzym';
-
-$sender='umat-srid';
-$Smail='josephkuttor730@gmail.com';
-$to = "$_SESSION[Email]";
-$subject = 'UMAT SRC';
-$ms=random_int(1000,9999);
 session_start();
-$_SESSION['otp']=$msg;
-$msg="<p>$_SESSION[Management] voting system.</p>
-                    <p>OTP to reset database '$ms'";
-        
-$mail->setFrom($Smail,$sender);
-$mail->addAddress($to);
+$From = 'UMAT-SRID';
+$Subject = 'UMAT SRC';
+$To = $_SESSION['Email'];
 
-$mail->Subject = $subject;
-$mail->Body = $msg;
+$otp = random_int(1000, 9999);
 
-if($mail->send()) {
-    echo <<<EOT
-        <script>
-            alert "An OTP has being sent!";
-        </script>
-    EOT;
-}else {
-    echo <<<EOT
-        <script>
-            alert "OTP sent failed! Refresh the page!";
-        </script>
-    EOT;
-}    
+$Body = "<p>UMAT SRC voting system.</p><p>OTP to reset system: <b>$otp</b></p>";
+$SuccessMsg = "<script>alert('An OTP has been sent!');</script>";
+$FailedMsg = "<script>alert('OTP sent failed! Refresh the page!');</script>";
+
+include 'mailer.php';
 
 ?>
 
