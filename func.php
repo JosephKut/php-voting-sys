@@ -62,10 +62,11 @@ function display_post(){
     foreach($result as $Pn){
         $get_Cand="SELECT * FROM src_candidate WHERE Post='$Pn[Post]'";
         $sult=$conn->query($get_Cand);
+        $p = str_replace("_"," ",substr($Pn['Post'],4));
         if ($sult->num_rows > 0){
             echo "
             <div style='background: rgba(225, 225, 225, 0.15); width: 80%; margin:2% 10%; justify-content: left; align-items: center; border-radius:5px;'>
-                <h3 style='color: #ddc918; margin-top:2%'>$Pn[Post]</h3>
+                <h3 style='color: #ddc918; margin-top:2%'>$p</h3>
             ";
             foreach($sult as $Pin){
             echo "
@@ -152,7 +153,7 @@ function sort_post(){
     $getPost="SELECT * FROM src_post";
     $result=$conn->query($getPost);
     foreach($result as $Pin){
-        $Position = str_replace("_"," ",$Pin['Post']);
+        $Position = str_replace("_"," ",substr($Pin['Post'],4));
         echo <<<EOT
         <option value=$Pin[Post]>$Position</option>
         EOT;
@@ -223,11 +224,13 @@ if (isset($_POST['save_choice'])){
 
         $Body ="<p>Your vote has being cast and received successfully.</p>
                         <h3>Vote Successful</h3>";
+
+        include 'mail.php';
         
         if($sent) {
             echo <<<EOT
             <script>
-                alert "You would receive an email as a prove of a successful vote!";
+                alert("You would receive an email as a prove of a successful vote!");
             </script>
             EOT;
         }
@@ -272,7 +275,7 @@ if (isset($_POST['save_choice'])){
             $N=2;
 
             if ("Multi-Voting"==$row['Type']){
-                $v= str_replace("_"," ",$VP);
+                $v= str_replace("_"," ",substr($VP,4));
                 echo"<br><h2 align='center' style='border-bottom: none;'>$v</h2><br>";
                 foreach($result as $Pin){
                     $getresult="SELECT * FROM $VP WHERE Candidate='$Pin[Full_Name]'";
@@ -290,7 +293,7 @@ if (isset($_POST['save_choice'])){
                 }
             }
             elseif ("Referendum"==$row['Type']) {
-                $v= str_replace("_"," ",$VP);
+                $v= str_replace("_"," ",substr($VP,4));
                 echo"<br><h2 align='center' style='border-bottom: none;'>$v</h2><br>";
                 foreach($result as $Pin){
                     $getresult="SELECT * FROM $VP WHERE Candidate='$Pin[Full_Name]' AND Votes='1'";
@@ -314,7 +317,7 @@ if (isset($_POST['save_choice'])){
                 }
             }
         }else{
-            $v= str_replace("_"," ",$VP);
+            $v= str_replace("_"," ",substr($VP,4));
             echo"<br><h2 align='center' style='border-bottom: none;'>$v</h2><br>
             <h5 align='center'>No results yet!!!</h5><br>";}
     }
@@ -329,19 +332,19 @@ if (isset($_POST['save_choice'])){
     function go(post){
         const c =document.querySelector('input[name="choice"]:checked').value;
         let new_choice = [post,c];
-        if (!c.include("@")){
+        if (!c.includes("@")){
             document.getElementById("s"+post).src = c.slice(1);
             let new_choice = [post,c[0]];    
         }
         list.push(new_choice);
-        console.log(list);
+        // console.log(list);
         save(post);
     }
 
     function save(post){
         const php_list = JSON.stringify(list);
         document.getElementById('array').value=php_list;
-        document.getElementById($p).style.display="none";
+        document.getElementById(post).style.display="none";
         const sav =`
             <h3>Saved !</h3>
         `;

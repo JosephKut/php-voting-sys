@@ -11,6 +11,7 @@ if ($_GET['Login'] === "success"){
     die();
 }
 include("jfunc.php");
+include("resources.php");
 $posts=get_post();
 ?>
 <!DOCTYPE html>
@@ -18,7 +19,7 @@ $posts=get_post();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="admin.css">
+    <link rel="stylesheet" href=<?php echo ($Domain."admin.css"); ?>>
     <title>UMAT-SRID VOTING SYSTEM </title>
 </head>
 <body>
@@ -183,7 +184,7 @@ $posts=get_post();
                     $getPost="SELECT * FROM jcr_post";
                     $result=$conn->query($getPost);
                     foreach($result as $Pin){
-                        $Position = str_replace("_"," ",$Pin['Post']);
+                        $Position = str_replace("_"," ",substr($Pin['Post'],4));
                     echo "
                     <tr>
                         <td>$Pin[Post_id]</td>

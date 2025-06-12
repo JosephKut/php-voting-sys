@@ -1,15 +1,15 @@
 <?php
 session_start();
 
-// if (isset($_GET['token']) && isset($_GET['time']) && isset($_GET['hash'])){
-// $token = $_GET['token'];
-// $time = $_GET['time'];
-// $hash = $_GET['hash'];
-// }
-// else{
-//     include 'invalid.php';
-//     die();
-// }
+if (isset($_GET['token']) && isset($_GET['time']) && isset($_GET['hash'])){
+$token = $_GET['token'];
+$time = $_GET['time'];
+$hash = $_GET['hash'];
+}
+else{
+    include 'invalid.php';
+    die();
+}
 
 include("connect.php");
 include("func.php");
@@ -23,7 +23,7 @@ echo"
     </script>";
 foreach($posts as $post){
     $Post[] = $post['POST'];
-    $DPost[] = str_replace("_"," ",$post['POST']);
+    $DPost[] = str_replace("_"," ",substr($post['POST'],4));
     $a = "sb".$post['POST'];
     $postButtonID[] = $a;
     $b = "s".$post['POST'];
@@ -38,6 +38,8 @@ foreach($posts as $post){
     </script>";   
 }
 
+include("resources.php");
+
 ?>
 
 <!DOCTYPE html>
@@ -45,13 +47,13 @@ foreach($posts as $post){
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="vo.css">
-    <link rel="stylesheet" href="login.css">
+    <link rel="stylesheet" href=<?php echo ($Domain."vo.css");?>>
+    <link rel="stylesheet" href=<?php echo ($Domain."login.css");?>>
     <title>UMAT-SRID VOTING SYSTEM</title>
 </head>
 <body>
 
-    <!-- <div class="login-wrapper" id="log-flex" style="display:none;">
+    <div class="login-wrapper" id="log-flex" style="display:none;">
         <form method="post" action=<?php echo $_SERVER['REQUEST_URI']; ?>>
             <h2>Login</h2>
             <div class="input-field">
@@ -68,7 +70,7 @@ foreach($posts as $post){
             <marquee><img src="images/m.jpeg" width="250" class="simg"></marquee>
             <img src="images/c7.jpeg" width="150" class="simg">
         </div>
-    </div> -->
+    </div>
 
     <div class="wrapper" id="poll" style="justify-content: center;"><!-- display:none;">-->
         <div class="ps" id="post">
@@ -78,7 +80,7 @@ foreach($posts as $post){
                 $i = 0;
                 $posts=get_post();
                 foreach($posts as $post){
-                    $Position = str_replace("_"," ",$post['POST']);
+                    $Position = str_replace("_"," ",substr($post['POST'],4));
                     echo<<<EOT
                         <div class="po">
                             <button id=$postButtonID[$i]>
@@ -123,7 +125,7 @@ foreach($posts as $post){
         ?>
         
     </div>
-    <script src="nav.js"></script>
+    <script src=<?php echo ($Domain."nav.js");?>></script>
     <?php
     if (isset($_POST['Student_Email']) && isset($_POST['Unique_Code'])){
         $Student_Email=$_POST['Student_Email'];

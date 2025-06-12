@@ -1,9 +1,13 @@
+<?php
+    include("resources.php");
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="admin.css">
+    <link rel="stylesheet" href=<?php echo ($Domain."admin.css");?>>
     <title>UMAT VOTING RESULT </title>
 </head>
 <body>
@@ -20,9 +24,9 @@
                 $table_check="SHOW TABLES LIKE '$VP'";
                 $table=$conn->query($table_check);
                 if ($table->num_rows>0){
-                    $getcandidates="SELECT * FROM candidate WHERE Post='$VP'";
+                    $getcandidates="SELECT * FROM src_candidate WHERE Post='$VP'";
                     $result=$conn->query($getcandidates);
-                    $getPost="SELECT * FROM post WHERE Post='$VP'";
+                    $getPost="SELECT * FROM src_post WHERE Post='$VP'";
                     $format=$conn->query($getPost);
                     $row=$format->fetch_assoc();
 
@@ -45,7 +49,7 @@
                                     animationEnabled: true,
                                     theme: "light",
                                     title:{
-                                        text: "<?php echo $VP; ?>"
+                                        text: "<?php echo str_replace("_"," ",substr($VP,4)); ?>"
                                     },
                                     axisY: {
                                         title: "Votes"

@@ -1,6 +1,7 @@
 <?php
 
 include 'connect.php';
+include 'resources.php';
 //include("func.php");
 
 if (isset($_POST['Report'])){
@@ -11,11 +12,11 @@ if (isset($_POST['Report'])){
     $pdf->SetFont('Helvetica', '', 12,);
     $year = date('Y');
 
-    // $pdf->StartTransform();
-    // $pdf->Ellipse(75,75,50,50,'CNZ');
-    // $pdf->Clip();
-    // $pdf->Image('images/a.jpg',50,50,100,'','','','',false,300,'',false,false,0);
-    // $pdf->StopTransform();
+/*  $pdf->StartTransform();
+    $pdf->Ellipse(75,75,50,50,'CNZ');
+    $pdf->Clip();
+    $pdf->Image('images/a.jpg',50,50,100,'','','','',false,300,'',false,false,0);
+    $pdf->StopTransform();*/
     $pdf->Write(5,'UNIVERSITY OF MINES AND TECHONOLOGY, ESSIKADO
 SCHOOL OF RAILWAY AND INFRUSTRACTURE DEVELOPMENT',1,);
     $pdf -> Ln();
@@ -114,18 +115,18 @@ No:        '.$pollC2.'        '.number_format(($pollC2/$No_votes)*100,2).'%', 0,
         sort_result($pdf,$post['POST']);   
     }
 
-    // $pdf->Cell(0, 10, "VOTER'S FEEDBACK", 0, 1, 'C');
-    //     $select="SELECT * FROM Feedback";
-    //     $sel=$conn->query($select);
-    //     $n=0;
-    //     foreach ($sel as $info){
-    //         $n+=1;
-    //         if (!empty($info['Feedback'])){
-    //             $pdf->MultiCell(0, 10,'   '.$n.'. '. $info['Feedback'],0,'L');
-    //             $pdf->Ln();
-    //             }
-    //     }
-    // $pdf->Ln();
+    /*$pdf->Cell(0, 10, "VOTER'S FEEDBACK", 0, 1, 'C');
+        $select="SELECT * FROM Feedback";
+        $sel=$conn->query($select);
+        $n=0;
+        foreach ($sel as $info){
+            $n+=1;
+            if (!empty($info['Feedback'])){
+                $pdf->MultiCell(0, 10,'   '.$n.'. '. $info['Feedback'],0,'L');
+                $pdf->Ln();
+                }
+        }
+    $pdf->Ln();*/
 
     $pdf->Cell(0, 10, "EC STATEMENT", 0, 1, 'C');
         $select="SELECT * FROM src_ec_statement";
@@ -143,6 +144,7 @@ No:        '.$pollC2.'        '.number_format(($pollC2/$No_votes)*100,2).'%', 0,
 }
 
 if (isset($_POST['Reset'])){
+    $class = "src";
     include 'OTP.php';
 }
 if (isset($_POST['verify'])){
@@ -166,76 +168,78 @@ if (isset($_POST['verify'])){
         }
         foreach($list as $li){
             if(!$conn->query("DELETE FROM $li[POST]")){
-                $hd;
+                console.log($li['POST']);
+                echo "Error deleting table: " . $conn->error;
             }
         }
         header("location: ad.src.php?Login=success");
     }else{
         echo <<<EOT
             <script>
-                alert "OTP Invalid!";
+                console.log("OTP Invalid!");
+                alert("OTP Invalid!");
             </script>
         EOT;
     }
 }
 
-// if (isset($_POST['Backup'])){
-//     echo "Fred";
-//     $backup_file = 'backup.sql';
-//     // $command = "mysqldump -h $host -u $user -p $pass $dbs > $backup_file";
-//     // exec($command);
-//     $table = array();
-//     $result = $con->query("SHOW TABLES");
+/*if (isset($_POST['Backup'])){
+    echo "Fred";
+    $backup_file = 'backup.sql';
+    // $command = "mysqldump -h $host -u $user -p $pass $dbs > $backup_file";
+    // exec($command);
+    $table = array();
+    $result = $con->query("SHOW TABLES");
 
-//     while ($row = $result->fetch_row()) {
-//         $tables[] = $row[0];
-//     }
+    while ($row = $result->fetch_row()) {
+        $tables[] = $row[0];
+    }
 
-//     $fp = fopen($backup_file, 'w');
+    $fp = fopen($backup_file, 'w');
 
-//     foreach ($tables as $table){
-//         $result = $con->query("SELECT * FROM $table");
+    foreach ($tables as $table){
+        $result = $con->query("SELECT * FROM $table");
 
-//         $fields = array();
-//         $fields_num = $result->field_count;
+        $fields = array();
+        $fields_num = $result->field_count;
 
-//         for ($i = 0; $i < $fields_num; $i++){
-//             $field = $result->fetch_field();
-//             $fields = $field->name;
-//         }
+        for ($i = 0; $i < $fields_num; $i++){
+            $field = $result->fetch_field();
+            $fields = $field->name;
+        }
 
-//         fwrite($fp, "DROP TABLE IF EXISTS $table;\n");
-//         fwrite($fp, "CREATE TABLE $table;\n");
+        fwrite($fp, "DROP TABLE IF EXISTS $table;\n");
+        fwrite($fp, "CREATE TABLE $table;\n");
 
-//         for($i = 0; $i < $fields_num; $i++){
-//             $fields = $result->fetch_field();
-//             fwrite($fp, "$field->name $field->type");
-//             if ($i < $fields_num -  1){
-//                 fwrite($fp, ",");
-//             }
-//             fwrite($fp, "\n");
-//         }
+        for($i = 0; $i < $fields_num; $i++){
+            $fields = $result->fetch_field();
+            fwrite($fp, "$field->name $field->type");
+            if ($i < $fields_num -  1){
+                fwrite($fp, ",");
+            }
+            fwrite($fp, "\n");
+        }
 
-//         fwrite($fp, ");\n");
-//         fwrite($fp, "INSERT INTO $table VALUES ");
+        fwrite($fp, ");\n");
+        fwrite($fp, "INSERT INTO $table VALUES ");
 
-//         while ($row = $result->fetch_row()) {
-//             $entry = '';
-//             foreach ($row as $value){
-//                 $entry .= "'$value',";
-//             }
-//             $entry = substr($entry, 0,-1);
-//             fwrite($fp, "($entry),\n");
-//         }
-//         fwrite($fp, ";\n\n");
-//     }
-//     fclose($fp);
-// }
+        while ($row = $result->fetch_row()) {
+            $entry = '';
+            foreach ($row as $value){
+                $entry .= "'$value',";
+            }
+            $entry = substr($entry, 0,-1);
+            fwrite($fp, "($entry),\n");
+        }
+        fwrite($fp, ";\n\n");
+    }
+    fclose($fp);
+}*/
 
 //Add posts to database
 if (isset($_POST['addP'])){
     //$postId=$_POST['postId'];
-    $postName= str_replace(" ","_", str_trim($_POST['postName']));
+    $postName= "src_".str_replace(" ","_", trim($_POST['postName']));
     $postType=$_POST['postType'];
 
     $checkPost="SELECT * FROM src_post where Post='$postName'";
@@ -440,12 +444,17 @@ if (isset($_POST['deletC'])){
         }
 
     function get_temp_link($stmail,$stun,$url="src.poll.php",$ex=3600){
-        session_start();
+        include 'resources.php';
+        // ...existing code...
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        // ...existing code...
         $token = bin2hex($stmail);
         $time = time();
         $ex_t = $time + $ex;
         $hash = hash_hmac('sha256',$token . $time, $stun);
-        $temp_link = $url.'?token='.$token.'&time='.$time.'&hash='.$hash;
+        $temp_link = $Domain.$url.'?token='.$token.'&time='.$time.'&hash='.$hash;
         return $temp_link;
     }
     
@@ -454,7 +463,7 @@ if (isset($_POST['deletC'])){
         $table_check="SHOW TABLES LIKE 'src_session'";
         $table=$conn->query($table_check);
         if ($table->num_rows>0){
-            $insert="UPDATE session SET session='start' WHERE session='start' OR session='stop'";   
+            $insert="UPDATE src_session SET session='start' WHERE session='start' OR session='stop'";   
 
                     $sql="SELECT Student_Email FROM voters";
                     $result=$conn->query($sql);
@@ -469,6 +478,7 @@ if (isset($_POST['deletC'])){
                     $FailedMsg = "failed";
 
                     foreach ($email as $To) {
+                        //echo "<script>console.log('$To');</script>";
                     
                         $msg=random_int(1000,9999);
                         $key="SRID.SRC.".$msg;
@@ -481,27 +491,30 @@ if (isset($_POST['deletC'])){
                         <p>Use your student email account and the unique code to login and cast your vote.</p>
                         <p>You would receive an email after done voting to affirm your vote has been cast successfully.</p>";
 
-                        include 'mailer.php';
-
                         $sql="SELECT * FROM src_sent_links WHERE Student_Email='$To'";
                         $result=$conn->query($sql);
                         if(!$result->num_rows>0){
 
-                            if($sent) {
+                            echo "<script>
+                                    console.log('Sending mail to $To');
+                                </script>";
+                            
+                            include 'mail.php';
+
+                            // if($sent == 1){
                                 $conn->query($insert);
                                 echo "Mail successful!";
-                                $insertQuery="INSERT INTO sent_links(Student_Email,Link_Sent)
-                                VALUES('$to','$_SESSION[slink]')";
+                                $insertQuery="INSERT INTO src_sent_links(Student_Email,Link_Sent)
+                                VALUES('$To','$_SESSION[slink]')";
                                 $conn->query($insertQuery);
-                            }else {
-                                echo "Mail failed!";
-                            }
-
+                            // }else {
+                            //     echo "Mail failed!";
+                            // }
                         }
                     }
-                    header("location: ad.src.php?Login=success");    
+            header("location: ad.src.php?Login=success");    
         }else{
-            $create_table="CREATE TABLE session(
+            $create_table="CREATE TABLE src_session(
                 session VARCHAR(5) NOT NULL)";
             $conn->query($create_table);
             header("location: ad.src.php?Login=success");

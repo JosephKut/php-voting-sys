@@ -109,18 +109,18 @@ No:        '.$pollC2.'        '.number_format(($pollC2/$No_votes)*100,2).'%', 0,
         sort_result($pdf,$post['POST']);   
     }
 
-    // $pdf->Cell(0, 10, "VOTER'S FEEDBACK", 0, 1, 'C');
-    //     $select="SELECT * FROM Feedback";
-    //     $sel=$conn->query($select);
-    //     $n=0;
-    //     foreach ($sel as $info){
-    //         $n+=1;
-    //         if (!empty($info['Feedback'])){
-    //             $pdf->MultiCell(0, 10,'   '.$n.'. '. $info['Feedback'],0,'L');
-    //             $pdf->Ln();
-    //             }
-    //     }
-    // $pdf->Ln();
+    /* $pdf->Cell(0, 10, "VOTER'S FEEDBACK", 0, 1, 'C');
+        $select="SELECT * FROM Feedback";
+        $sel=$conn->query($select);
+        $n=0;
+        foreach ($sel as $info){
+            $n+=1;
+            if (!empty($info['Feedback'])){
+                $pdf->MultiCell(0, 10,'   '.$n.'. '. $info['Feedback'],0,'L');
+                $pdf->Ln();
+                }
+        }
+    $pdf->Ln();*/
 
     $pdf->Cell(0, 10, "EC STATEMENT", 0, 1, 'C');
         $select="SELECT * FROM jcr_ec_statement";
@@ -138,6 +138,7 @@ No:        '.$pollC2.'        '.number_format(($pollC2/$No_votes)*100,2).'%', 0,
 }
 
 if (isset($_POST['Reset'])){
+    $class = "jcr";
     include 'OTP.php';
 }
 if (isset($_POST['verify'])){
@@ -229,7 +230,7 @@ if (isset($_POST['verify'])){
 
 if (isset($_POST['jaddP'])){
     //$postId=$_POST['postId'];
-    $postName = str_replace(" ","_", str_trim($_POST['postName']));
+    $postName = "jcr_".str_replace(" ","_", trim($_POST['postName']));
     $postType=$_POST['postType'];
 
     $checkPost="SELECT * FROM jcr_post where Post='$postName'";
@@ -435,7 +436,11 @@ if (isset($_POST['jdeletC'])){
     
         function get_temp_link($stmail,$stun,$url="jcr.poll.php",$ex=3600){
             include 'resources.php';
-            session_start();
+            // ...existing code...
+            if (session_status() === PHP_SESSION_NONE) {
+                session_start();
+            }
+            // ...existing code...
             $token = bin2hex($stmail);
             $time = time();
             $ex_t = $time + $ex;
@@ -463,6 +468,7 @@ if (isset($_POST['jdeletC'])){
                     $FailedMsg = "failed";
 
                     foreach ($email as $To){
+                        echo "<script>console.log('$To');</script>";
                         $msg=random_int(1000,9999);
                         $key="SRID.JCR.".$msg;
 
@@ -473,21 +479,26 @@ if (isset($_POST['jdeletC'])){
                         <p>Use your student email account and the unique code to login and cast your vote.</p>
                         <p>You would receive an email after done voting to affirm your vote has been cast successfully.</p>";
                         
-                        include 'mailer.php';
-
                         $sql="SELECT * FROM jcr_sent_links WHERE Student_Email='$To'";
                         $result=$conn->query($sql);
                         if(!$result->num_rows>0){
 
-                            if($sent) {
+                            echo "<script>
+                                    console.log('Sending mail to $To');
+                                </script>";
+
+                            include 'mail.php';
+                            // $sent = "<script> sent; </script>"; // Simulating email sent status
+
+                            // if($sent == 1) {
                                 $conn->query($insert);
                                 echo "Mail successful!";
                                 $insertQuery="INSERT INTO jcr_sent_links(Student_Email,Link_Sent)
-                                VALUES('$to','$_SESSION[jlink]')";
+                                VALUES('$To','$_SESSION[jlink]')";
                                 $conn->query($insertQuery);
-                            }else {
-                                echo "Mail failed!";
-                            }
+                            // }else {
+                            //     echo "Mail failed!";
+                            // }
                             
                         }
                     }

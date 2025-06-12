@@ -1,13 +1,16 @@
 <?php
 session_start();
 $_SESSION['Email']="josephkuttor730@gmail.com";
+
+include("resources.php");
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="log.css">
+    <link rel="stylesheet" href=<?php echo ($Domain."log.css");?>>
     <title>AD Registration</title>
 </head>
 <body>

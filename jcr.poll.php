@@ -1,15 +1,15 @@
 <?php
 session_start();
 
-// if (isset($_GET['token']) && isset($_GET['time']) && isset($_GET['hash'])){
-// $token = $_GET['token'];
-// $time = $_GET['time'];
-// $hash = $_GET['hash'];
-// }
-// else{
-//     include 'invalid.php';
-//     die();
-// }
+if (isset($_GET['token']) && isset($_GET['time']) && isset($_GET['hash'])){
+$token = $_GET['token'];
+$time = $_GET['time'];
+$hash = $_GET['hash'];
+}
+else{
+    include 'invalid.php';
+    die();
+}
 
 include("connect.php");
 include("jfunc.php");
@@ -23,7 +23,7 @@ echo"
     </script>";
 foreach($posts as $post){
     $Post[] = $post['POST'];
-    $DPost[] = str_replace("_"," ",$post['POST']);
+    $DPost[] = str_replace("_"," ",substr($post['POST'],4));
     $a = "jb".$post['POST'];
     $postButtonID[] = $a;
     $b = "j".$post['POST'];
@@ -38,6 +38,8 @@ foreach($posts as $post){
     </script>";   
 }
 
+    include("resources.php");
+
 ?>
 
 <!DOCTYPE html>
@@ -45,13 +47,14 @@ foreach($posts as $post){
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="vo.css">
-    <link rel="stylesheet" href="login.css">
+    <link rel="stylesheet" href=<?php echo ($Domain."vo.css");?>>
+    <link rel="stylesheet" href=<?php echo ($Domain."login.css");?>>
+    <!-- <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"> -->
     <title>UMAT-SRID VOTING SYSTEM</title>
 </head>
 <body>
 
-    <!-- <div class="login-wrapper" id="log-flex" style="display:none;">
+    <div class="login-wrapper" id="log-flex" style="display:none;">
         <form method="post" action=<?php echo $_SERVER['REQUEST_URI']; ?>>
             <h2>Login</h2>
             <div class="input-field">
@@ -68,7 +71,7 @@ foreach($posts as $post){
             <marquee><img src="images/m.jpeg" width="250" class="simg"></marquee>
             <img src="images/c7.jpeg" width="150" class="simg">
         </div>
-    </div> -->
+    </div>
 
     <div class="wrapper" id="poll" style="justify-content: center;"> <!--display:none;">-->
         <div class="ps" id="post">
@@ -78,7 +81,7 @@ foreach($posts as $post){
                 $i = 0;
                 $posts=get_post();
                 foreach($posts as $post){
-                    $Position = str_replace("_"," ",$post['POST']);
+                    $Position = str_replace("_"," ",substr($post['POST'],4));
                     echo<<<EOT
                         <div class="po">
                             <button id=$postButtonID[$i]>
@@ -123,8 +126,9 @@ foreach($posts as $post){
         ?>
         
     </div>
-    <script src="navj.js"></script>
-    <!-- <?php
+
+    <script src=<?php echo ($Domain."navj.js");?>></script>
+    <?php
     if (isset($_POST['Student_Email']) && isset($_POST['Unique_Code'])){
         if (!validate_link($token,$time,$hash,$_POST['Student_Email'],$_POST['Unique_Code'])){
             die();
@@ -147,6 +151,15 @@ foreach($posts as $post){
         </script>
         EOT;
      }
-    ?> -->
+    ?>
+    <!-- <svg xmlns="http://www.w3.org/2000/svg"
+        width="24" height="24" viewBox="0 0 24 24"
+        fill="none" stroke="currentColor"
+        stroke-width="2" stroke-linecap="round"
+        stroke-linejoin="round"
+        class="lucide lucide-vote w-16 h-16 text-blue-600 mx-auto mb-4"
+        aria-hidden="true">
+      <path d="M12 2v20m0 0l-4-4m4 4l4-4" />
+    </svg> -->
 </body>
 </html>
