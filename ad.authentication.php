@@ -100,7 +100,7 @@ if (isset ($_POST['login'])){
                     break;
                 
                 default:
-                    header("location: ad.dept.php?Login=success");
+                    header("location: ad.src.php?Login=success");
                     break;
             }
         }

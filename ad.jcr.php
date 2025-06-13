@@ -2,12 +2,12 @@
 if ($_GET['Login'] === "success"){
     session_start();
     if (!$_SESSION['Management']){
-        header("location: ad.login.php");
+        header("location: index.php");
         session_destroy();
         die();    
     }
 }else{
-    header("location: ad.login.php");
+    header("location: index.php");
     die();
 }
 include("jfunc.php");
