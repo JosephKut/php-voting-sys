@@ -484,18 +484,17 @@ if (isset($_POST['jdeletC'])){
                                     console.log('Sending mail to $To');
                                 </script>";
 
-                            include 'mail.php';
-                            // $sent = "<script> sent; </script>"; // Simulating email sent status
+                            include 'mailer.php';
 
-                            // if($sent == 1) {
+                            if($sent) {
                                 $conn->query($insert);
                                 echo "Mail successful!";
                                 $insertQuery="INSERT INTO jcr_sent_links(Student_Email,Link_Sent)
                                 VALUES('$To','$_SESSION[jlink]')";
                                 $conn->query($insertQuery);
-                            // }else {
-                            //     echo "Mail failed!";
-                            // }
+                            }else {
+                                echo "Mail failed!";
+                            }
                             
                         }
                     }

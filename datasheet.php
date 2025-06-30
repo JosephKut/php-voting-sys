@@ -1,7 +1,15 @@
 <?php
+// Main processing logic
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 if ($_SERVER['REQUEST_METHOD'] != 'POST'){
         header("location: index.php");
     }
+if ($_GET['access'] !== $_SESSION['access']){
+    header("location: index.php");
+    die();
+}
 // config.php - Database configuration
 class DatabaseConfig {
     private $host = 'localhost';
@@ -43,7 +51,7 @@ class ExcelImporter {
             Index_No VARCHAR(17) PRIMARY KEY,
             Last_Name VARCHAR(255) NOT NULL,
             Other_Name VARCHAR(255),
-            Student_Email VARCHAR(255) NOT NULL,
+            Student_Email VARCHAR(255) NOT NULL UNIQUE,
             Programme VARCHAR(255) NOT NULL,
             Tel VARCHAR(20) NOT NULL,
             date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -300,11 +308,6 @@ class ExcelImporter {
         ]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-}
-
-// Main processing logic
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
 }
 
 $importer = new ExcelImporter();

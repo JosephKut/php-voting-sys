@@ -10,7 +10,7 @@ $Domain = "hall.ghprofit.com/";
 
 $mail->isSMTP();
 $mail->SMTPAuth = true;
-$mail->Host = 'smtp.gmail.com';
+$mail->Host = 'ghprofit.com';
 $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
 $mail->Port = 587;
 $mail->Username = 'sa@ghprofit.com';

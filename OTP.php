@@ -15,7 +15,7 @@ $Body = "<p>UMAT $class voting system.</p><p>OTP to reset system: <b>$otp</b></p
 $SuccessMsg = "<script>alert('An OTP has been sent!');</script>";
 $FailedMsg = "<script>alert('OTP sent failed! Refresh the page!');</script>";
 
-include 'mail.php';
+include 'mailer.php';
 include("resources.php");
 
 // if ($sent==true) {

@@ -488,17 +488,17 @@ if (isset($_POST['deletC'])){
                                     console.log('Sending mail to $To');
                                 </script>";
                             
-                            include 'mail.php';
+                            include 'mailer.php';
 
-                            // if($sent == 1){
+                            if($sent == 1){
                                 $conn->query($insert);
                                 echo "Mail successful!";
                                 $insertQuery="INSERT INTO src_sent_links(Student_Email,Link_Sent)
                                 VALUES('$To','$_SESSION[slink]')";
                                 $conn->query($insertQuery);
-                            // }else {
-                            //     echo "Mail failed!";
-                            // }
+                            }else {
+                                echo "Mail failed!";
+                            }
                         }
                     }
             header("location: ad.src.php?Login=success");    

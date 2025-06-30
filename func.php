@@ -237,7 +237,7 @@ if (isset($_POST['save_choice'])){
         $Body ="<p>Your vote has being cast and received successfully.</p>
                         <h3>Vote Successful</h3>";
 
-        include 'mail.php';
+        include 'mailer.php';
         
         if($sent) {
             echo <<<EOT
