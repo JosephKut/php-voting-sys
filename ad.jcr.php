@@ -65,48 +65,144 @@ $posts=get_post();
                 </form>
             </div>
             <div class="dash">
-                <div class="Cdash">Total Voters <h2><?php echo j_get_no_of_voters(); ?></h2></div>
                 <div class="Cdash">
-                Total Links Sent
-                <h2><?php echo jget_no_of_links_sent(); ?></h2>
+                    Total Voters
+                    <h2><?php echo j_get_no_of_voters(); ?></h2>
+                    <button class="views" onclick="voters()" >view</button>
+                </div>
+                <div class="Cdash">
+                    Total Links Sent
+                    <h2><?php echo jget_no_of_links_sent(); ?></h2>
+                    <button class="views" onclick="not_sent()" >view</button>
                 </div>
             </div>
             <div class="dash">
-                <div class="Cdash">Total Votes<h2> <?php echo j_get_no_of_votes(); ?> </h2></div>
+                <div class="Cdash">
+                    Total Votes
+                    <h2><?php echo j_get_no_of_votes(); ?> </h2>
+                    <button class="views" onclick="voted_info()" >view</button>
+                </div>
                 <div class="Sdash">
-                <form action="jcr.php" method="post">
-                    <details>
-                        <summary><h6>Session</h6></summary>
-                        <button class="ses-but" name="jsst" id="jsst" style="width:40%; color: black;">Start</button>
-                        <button class="ses-but" name="jssp" id="jssp" style="width:40%; color: black;">Stop</button>
+                <form action="jcr.php" method="post" style="gap: 0;">
+                    <input type="number" placeholder="Duration in hours" name="duration" title="4hours">
+                    <div class="details">
+                        <details>
+                        <summary>Session</summary>
+                        <button class="ses-but" name="jsst" id="jsst" style="width:30%; color: white; border: none; padding: 0 15px;">Start</button>
+                        <button class="ses-but" name="jssp" id="jssp" style="width:30%; color: white; border: none; padding: 0 15px;">Stop</button>
+                        </details>
                         <?php
                             $get_s="SELECT * FROM jcr_session";
                             $session=$conn->query($get_s);
                             $ses=$session->fetch_assoc();
-                            if ($ses['session']=='start'){
-                                echo "<script>
+                            if ($ses['status']== 1){
+                                echo "<p style='color: green;'>Session is running</p>
+                                <script>
                                 const jsst=document.getElementById('jsst');
                                 jsst.style.backgroundColor='#ddc918';
                                 </script>";
                             }else {
-                                echo "<script>
+                                echo "<p style='color: red;'>Session is stopped</p>
+                                <script>
                                 const jssp=document.getElementById('jssp');
                                 jssp.style.background='#ddc918';
                                 </script>";
                             }
                         ?>
-                    </details>
+                    </div>
                 </form>
                 </div>
+            </div>
+        </div>
+        <div class="content" id="voters" style="display: none;">
+            <?php include 'voters.php';?>
+        </div>
+        <div class="content" id="not_sent" style="display: none;" >
+            <div class="table-section">
+            <div class="table-container">
+                <table class="voters-table">
+                    <thead>
+                        <tr>
+                            <th colspan="5"><h3>Voters Yet To Receive Link</h3></th>
+                </tr>
+                <tr>
+                    <th>Index_No</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Programme</th>
+                    <th>Contact</th>
+                </tr>
+                <tbody>
+                <?php
+                    include 'connect.php';
+                    $getVoters="SELECT * FROM voters";
+                    $result=$conn->query($getVoters);
+                    foreach($result as $Pin){
+                        $getVoters="SELECT * FROM jcr_sent_links WHERE Student_Email ='$Pin[Student_Email]'";
+                        $status=$conn->query($getVoters);
+                        if($status->num_rows > 0){
+                            continue; // Skip if the voter has already recieved link
+                        }
+                        echo "
+                        <tr>
+                            <td>$Pin[Index_No]</td>
+                            <td>$Pin[Last_Name] $Pin[Other_Name]</td>
+                            <td>$Pin[Student_Email]</td>
+                            <td>$Pin[Programme]</td>
+                            <td>$Pin[Tel]</td>
+                        </tr>";
+                    }
+                ?>
+                </tbody>
+                </table>
+            </div>
+            </div>
+        </div>
+        <div class="content" id="voted" style="display: none;" >
+            <div class="table-section">
+            <div class="table-container">
+                <table class="voters-table">
+                    <thead>
+                <tr>
+                    <th colspan="6"><h3>Voted List</h3></th>
+                </tr>
+                <tr>
+                    <th>Index_No</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Programme</th>
+                    <th>Contact</th>
+                    <th>Time</th>
+                </tr>
+                <tbody>
+                <?php
+                    include 'connect.php';
+                    $getVoted="SELECT * FROM voters";
+                    $result=$conn->query($getVoted);
+                    foreach($result as $Pin){
+                        $getVotes="SELECT * FROM jcr_votes WHERE Student_Email ='$Pin[Student_Email]'";
+                        $status=$conn->query($getVotes);
+                        if($status->num_rows > 0){
+                            echo "
+                            <tr>
+                                <td>$Pin[Index_No]</td>
+                                <td>$Pin[Last_Name] $Pin[Other_Name]</td>
+                                <td>$Pin[Student_Email]</td>
+                                <td>$Pin[Programme]</td>
+                                <td>$Pin[Tel]</td>
+                                <td>$status[time]</td>
+                            </tr>";
+                        }
+                    }
+                ?>
+                </tbody>
+                </table>
+            </div>
             </div>
         </div>
         <div class="content" id="postM" style="display: none;">
             <form action="jcr.php" method="post">
                 <h2>Post Management</h2>
-                <!-- <div class="input-field">
-                    <input type="text" name="postId" required>
-                    <label>Post ID</label>
-                </div> -->
                 <div class="input-field">
                     <input type="text" name="postName">
                     <label>Post</label>
@@ -172,7 +268,7 @@ $posts=get_post();
         <div class="content" id="viewC" style="display: none;">
             <table>
                  <tr>
-                     <th colspan="3">Positions</th>
+                     <th colspan="3"><h3>Positions</h3></th>
                  </tr>
                  <tr>
                      <th>Post Id</th>
@@ -199,59 +295,58 @@ $posts=get_post();
          </div>
          <div class="content" id="viewR" style="display: none;">
             <h2>VOTING RESULTS</h2>   
-            <form action="jcr.php" methiod="get">
+            <form action="jcr.php" method="get">
                 <div class="state">
                     <button name='jcr_chart' title="Graphical representation of results.">Charts</button>
                 </div>
             </form>
-            <?php
-                foreach($posts as $post){
-                    sort_result($post['POST']);
-                }
-                ?>
-         </div>
-         <!-- <div class="content" id="NB" style="display: none; padding: 1%; justify-content: center;  align-content: center;">
-            <form action="jcr.php" method="post" enctype="multipart/form-data" style="height:100%;">
-                <h2>Notice Board</h2>
-                <textarea id="msg" name="msg" placeholder="Message" style="height: 600%; width: 80%; padding: 1%;"></textarea>
-                <div id="ed">
-                <label for="file">Include File</label>
-                <input type="file" id="file" name="file">
-                 </div>
-                <div id="ed">
-                    <label>To update or delete msg:</label>
-                    <input class="selector" type="text" name="selector" placeholder="Enter SN of msg">
-                </div>
-                <div class="button">
-                    <button name="jaddNB">Submit</button>
-                    <button name="jupdateNB">Update</button>
-                    <button name="jdeleteNB">Delete</button>
+            <form action="jcr.php" method="post">
+                <div class="state">
+                    <button name='release_result' id="release" >Release Result</button>
                 </div>
             </form>
-            <details>
-                <summary><h3>Preview Notes</h3></summary>
-                <?php
-                $select="SELECT * FROM jcr_NB";
-                $sel=$conn->query($select);
-                foreach ($sel as $info){
-                    if (!empty($info['Message'])){
-                    echo<<<EOT
-                        <div style="width: 80%; padding: 2%; margin: 1%;"><p title="SN.$info[SN]">$info[Message]</p></div>
-                    EOT;}
-                    if ($info['File']!="uploads/"){
-                    echo<<<EOT
-                        <div><embed src="$info[File]" title="SN.$info[SN]" style=" height:500px; width: 500px; padding:2%; border-radius:5%;"></div>
-                    EOT;}
+            <?php
+                $get_s="SELECT * FROM jcr_session";
+                $session=$conn->query($get_s);
+                $ses=$session->fetch_assoc();
+                if ($ses['release']== 1){
+                    echo <<<EOT
+                        <script>
+                            document.getElementById('release').textContent='Withold Result';
+                        </script>
+                    EOT;
+                }else {
+                    echo <<<EOT
+                        <div class="results-grid">
+                            <div class="results-list">
+                                <h3>Results Not Released</h3>
+                                <h3>Could be</h3>
+                                <div class="candidate-result">
+                                    <h4>there are no results</h4>
+                                </div>
+                                <div class="candidate-result">
+                                    <h4>voting has not yet ended</h4>
+                                </div>
+                            </div>
+                        </div>
+                    EOT;
                 }
-              ?>
-            </details>
-        </div> -->
+                if ($ses['status']== 1) {
+                    echo <<<EOT
+                        <script>
+                            document.getElementById('release').disabled = true;
+                        </script>
+                    EOT;
+                }
+                if ($ses['release']== 1) {
+                    foreach($posts as $post){
+                        sort_result($post['POST']);
+                    }
+                }
+            ?>
+         </div>
 
         <div class="content" id="ST" style="display: none; padding: 1%;  align-content: center;">
-            <!-- <div class="state">
-                <button id="Bstate">EC Stament</button>
-                <button id="Bfeedback">Voters Feedback</button>
-            </div> -->
                 <form id="state" action="jcr.php" method="post" enctype="multipart/form-data" style="height:100%;">
                     <input name="title" placeholder="Title" style="height: 50%; width: 100%; padding: 1%; margin: 1%;"></input>
                     <textarea name="statement" placeholder="Statement" style="height: 600%; width: 100%; padding: 1%; margin: 1%;"></textarea>
@@ -279,37 +374,8 @@ $posts=get_post();
                     ?>
                     </details>
                 </form>
-                <!-- <div  id="feedback" style="display: none;">
-                    <?php
-                    $select="SELECT * FROM jcr_Feedback";
-                    $sel=$conn->query($select);
-                    $n=0;
-                    echo"<h2>Feedbacks</h2>";
-                    foreach ($sel as $info){
-                        $n+=1;
-                        if (!empty($info['Feedback'])){
-                        echo<<<EOT
-                            <div align="left" style="width: 80%; padding: 2% 2% 0 2%; margin: 0 5% 0 5%; overflow-wrap: break-word;"><p>$n. $info[Feedback]</p></div>
-                        EOT;}
-                    }
-                    ?>
-                </div> -->
         </div>
-    <script src="nav.js"></script>
-    <script src="canvasjs.min.js"></script>
-    <!-- <script>
-        const state=document.getElementById('state');
-        const feedback=document.getElementById('feedback');
-
-        document.getElementById('Bstate').addEventListener('click', function(){
-            state.style.display="flex";
-            feedback.style.display="none";
-        })
-
-        document.getElementById('Bfeedback').addEventListener('click', function(){
-            state.style.display="none";
-            feedback.style.display="block";
-        })
-    </script> -->
+    <script src=<?php echo ($Domain."nav.js"); ?>></script>
+    <script src=<?php echo ($Domain."canvasjs.min.js"); ?>></script>
 </body>
 </html>

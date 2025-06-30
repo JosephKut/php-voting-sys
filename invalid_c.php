@@ -14,6 +14,7 @@
     <div class="wrapper">
         <div class="pv">
             <div id="waterm"></div>
+            <h1 style="color:green;">🚫❌❗</h1>
             <h1>Credentials Invalid!</h1>
             </div>
         </div>

@@ -12,6 +12,7 @@ if ($_GET['Login'] === "success"){
 }
 include("func.php");
 include("resources.php");
+include 'connect.php';
 $posts=get_post();
 ?>
 <!DOCTYPE html>
@@ -67,37 +68,138 @@ $posts=get_post();
                 </form>
             </div>
             <div class="dash">
-                <div class="Cdash">Total Voters <h2><?php echo get_no_of_voters(); ?></h2></div>
                 <div class="Cdash">
-                Total Links Sent
-                <h2><?php echo get_no_of_links_sent(); ?></h2>
+                    Total Voters
+                    <h2><?php echo get_no_of_voters(); ?></h2>
+                    <button class="views" onclick="voters()">view</button>
+                </div>
+                <div class="Cdash">
+                    Total Links Sent
+                    <h2><?php echo get_no_of_links_sent(); ?></h2>
+                    <button class="views" onclick="not_sent()" >view</button>
                 </div>
             </div>
             <div class="dash">
-                <div class="Cdash">Total Votes<h2> <?php echo get_no_of_votes(); ?> </h2></div>
-                <div class="Sdash"><form action="src.php" method="post">
-                    <details>
-                        <summary><h6>Session</h6></summary>
-                        <button class="ses-but" name="sst" id="sst" style="width:40%; color: black;">Start</button>
-                        <button class="ses-but" name="ssp" id="ssp" style="width:40%; color: black;">Stop</button>
+                <div class="Cdash">
+                    Total Votes
+                    <h2> <?php echo get_no_of_votes(); ?> </h2>
+                    <button class="views" onclick="voted_info()" >view</button>
+                </div>
+                <div class="Sdash">
+                    <form action="src.php" method="post" style="gap: 0;">
+                    <input type="number" placeholder="Duration in hours" name="duration" title="4hours">
+                    <div class="details">
+                        <details>
+                        <summary>Session</summary>
+                        <button class="ses-but" name="sst" id="sst" style="width:30%; color: white; border: none; padding: 0 15px;">Start</button>
+                        <button class="ses-but" name="ssp" id="ssp" style="width:30%; color: white; border: none; padding: 0 15px;">Stop</button>
+                        </details>
                         <?php
                             $get_s="SELECT * FROM src_session";
                             $session=$conn->query($get_s);
                             $ses=$session->fetch_assoc();
-                            if ($ses['session']=='start'){
-                                echo "<script>
+                            if ($ses['status']== 1){
+                                echo "<p style='color: green;'>Session is running</p>
+                                <script>
                                 const sst=document.getElementById('sst');
                                 sst.style.backgroundColor='#ddc918';
                                 </script>";
                             }else {
-                                echo "<script>
+                                echo "<p style='color: red;'>Session has stopped</p>
+                                <script>
                                 const ssp=document.getElementById('ssp');
                                 ssp.style.background='#ddc918';
                                 </script>";
                             }
                         ?>
-                    </details>
-                    </form></div>
+                    </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="content" id="voters" style="display: none;">
+            <?php include 'voters.php';?>
+        </div>
+        <div class="content" id="not_sent" style="display: none;" >
+            <div class="table-section">
+            <div class="table-container">
+                <table class="voters-table">
+                    <thead>
+                        <tr>
+                            <th colspan="5"><h3>Voters Yet To Receive Link</h3></th>
+                        </tr>
+                        <tr>
+                            <th>Index_No</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Programme</th>
+                            <th>Contact</th>
+                        </tr>
+                </thead>
+                <tbody>
+                <?php
+                    $getVoters="SELECT * FROM voters";
+                    $result=$conn->query($getVoters);
+                    foreach($result as $Pin){
+                        $getVoters="SELECT * FROM src_sent_links WHERE Student_Email ='$Pin[Student_Email]'";
+                        $status=$conn->query($getVoters);
+                        if($status->num_rows > 0){
+                            continue; // Skip if the voter has already recieved link
+                        }
+                        echo "
+                        <tr>
+                            <td>$Pin[Index_No]</td>
+                            <td>$Pin[Last_Name] $Pin[Other_Name]</td>
+                            <td>$Pin[Student_Email]</td>
+                            <td>$Pin[Programme]</td>
+                            <td>$Pin[Tel]</td>
+                        </tr>";
+                    }
+                ?>
+                </tbody>
+                </table>
+            </div>
+            </div>
+        </div>
+        <div class="content" id="voted" style="display: none;" >
+            <div class="table-section">
+            <div class="table-container">
+                <table class="voters-table">
+                    <thead>
+                <tr>
+                    <th colspan="6"><h3>Voted List</h3></th>
+                </tr>
+                <tr>
+                    <th>Index_No</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Programme</th>
+                    <th>Contact</th>
+                    <th>Time</th>
+                </tr>
+                <tbody>
+                <?php
+                    $getVoted="SELECT * FROM voters";
+                    $result=$conn->query($getVoted);
+                    foreach($result as $Pin){
+                        $getVotes="SELECT * FROM src_votes WHERE Student_Email ='$Pin[Student_Email]'";
+                        $status=$conn->query($getVotes);
+                        if($status->num_rows > 0){
+                            echo "
+                            <tr>
+                                <td>$Pin[Index_No]</td>
+                                <td>$Pin[Last_Name] $Pin[Other_Name]</td>
+                                <td>$Pin[Student_Email]</td>
+                                <td>$Pin[Programme]</td>
+                                <td>$Pin[Tel]</td>
+                                <td>$status[time]</td>
+                            </tr>";
+                        }
+                    }
+                ?>
+                </tbody>
+                </table>
+            </div>
             </div>
         </div>
         <div class="content" id="postM" style="display: none;">
@@ -170,48 +272,6 @@ $posts=get_post();
             </form>
         </div>
 
-        <!-- <div class="content" id="deptM" style="display: none;">
-            <form action="src.php" method="post" enctype="multipart/form-data">
-                <h2>Departmental Management</h2>
-                <div class="input-field">
-                    <input type="text" name="deptN">
-                    <label>Name</label>
-                </div>
-                <div class="input-field">
-                    <input type="text" name="abb">
-                    <label>Abberiviation</label>
-                </div>
-                <div style="display: flex; justify-content: space-evenly;">
-                    <div style="margin:auto;">
-                            <label for="course">Course</label>
-                            <select name="course">
-                                <option value="0" selected disabled>Course</option>
-                                    <option value="0" selected disabled></option>
-                                    <option value="CE">Computer Science And Engineering</option>
-                                    <option value="EL">Electrical And Electronic Engineering</option>
-                                    <option value="MC">Mechanical Engineering</option>
-                                    <option value="CE">Civil Engineering</option>
-                                    <option value="GE">Geological Engineering</option>
-                                    <option value="GM">Geomatic Engineering</option>
-                                    <option value="EV">Environmental Engineering</option>
-                            </select>
-                    </div>
-                    <div style="margin:auto;">
-                            <label for="logo">Logo</label>
-                            <input name="logo" type="file" >
-                    </div>
-                </div>
-                <div id="ed">
-                    <label>Termination of a department:</label>
-                    <input class="selector" name="selector" type="text" placeholder="Enter department">
-                </div>
-                <div>
-                    <button  name="addD">Add</button>
-                    <button name="deleteD">Delete</button>
-                </div>
-            </form>
-        </div> -->
-
         <div class="content" id="viewC" style="display: none;">
         <table >
                  <tr>
@@ -223,7 +283,6 @@ $posts=get_post();
                      <th>Type</th>
                  </tr>
                  <?php
-                    include 'connect.php';
                     $getPost="SELECT * FROM src_post";
                     $result=$conn->query($getPost);
                     foreach($result as $Pin){
@@ -242,67 +301,63 @@ $posts=get_post();
          </div>
          <div class="content" id="viewR" style="display: none;">
             <h2>VOTING RESULTS</h2>
-            <form action="src.php" methiod="get">
+            <form action="src.php" method="get">
                 <div class="state">
                     <button name='src_chart' title="Graphical representation of results.">Charts</button>
                 </div>
             </form>
+            <form action="src.php" method="post">
+                <div class="state">
+                    <button name='release_result' id="release" >Release Result</button>
+                </div>
+            </form>
             <?php
-                foreach($posts as $post){
-                    sort_result($post['POST']);   
+                $get_s="SELECT * FROM src_session";
+                $session=$conn->query($get_s);
+                $ses=$session->fetch_assoc();
+                if ($ses['release']== 1){
+                    echo <<<EOT
+                        <script>
+                            document.getElementById('release').textContent='Withold Result';
+                        </script>
+                    EOT;
+                }else {
+                    echo <<<EOT
+                        <div class="results-grid">
+                            <div class="results-list">
+                                <h3>Results Not Released</h3>
+                                <h3>Could be</h3>
+                                <div class="candidate-result">
+                                    <h4>there are no results</h4>
+                                </div>
+                                <div class="candidate-result">
+                                    <h4>voting has not yet ended</h4>
+                                </div>
+                            </div>
+                        </div>
+                    EOT;
+                }
+                if ($ses['status']== 1) {
+                    echo <<<EOT
+                        <script>
+                            document.getElementById('release').disabled = true;
+                        </script>
+                    EOT;
+                }
+                if ($ses['release']== 1) {
+                    foreach($posts as $post){
+                        sort_result($post['POST']);
+                    }
                 }
             ?>
          </div>
-         <!-- <div class="content" id="NB" style="display: none; padding: 1%; justify-content: center;  align-content: center;">
-            <form action="src.php" method="post" enctype="multipart/form-data" style="height:100%;">
-                <h2>Notice Board</h2>
-                <textarea name="msg" placeholder="Message" style="height: 600%; width: 80%; padding: 1%;"></textarea>
-                <div id="ed">
-                <label for="file">Include File</label>
-                <input type="file" id="file" name="file">
-                 </div>
-                <div id="ed">
-                    <label>To update or delete msg:</label>
-                    <input class="selector" type="text" name="selector" placeholder="Enter SN of msg">
-                </div>
-                <div class="button">
-                    <button name="addNB">Submit</button>
-                    <button name="updateNB">Update</button>
-                    <button name="deleteNB">Delete</button>
-                </div>
-            </form>
-            <details>
-                <summary><h3>Preview Notes</h3></summary>
-                <?php
-                $select="SELECT * FROM src_NB";
-                $sel=$conn->query($select);
-                foreach ($sel as $info){
-                    if (!empty($info['Message'])){
-                    echo<<<EOT
-                        <div style="width: 80%; padding: 2%; margin: 1%;"><p title="SN.$info[SN]">$info[Message]</p></div>
-                    EOT;}
-                    if ($info['File']!="uploads/"){
-                    echo<<<EOT
-                        <div><embed src="$info[File]" title="SN.$info[SN]" style=" height:500px; width: 500px; padding:2%; border-radius:5%;"></div>
-                    EOT;}
-                }
-              ?>
-            </details>
-         </div> -->
 
          <div class="content" id="ST" style="display: none; padding: 1%;  align-content: center;">
-            <!-- <div class="state">
-                <button id="Bstate">EC Stament</button>
-                <button id="Bfeedback">Voters Feedback</button>
-                </div> -->
                 <form id="state" action="src.php" method="post" enctype="multipart/form-data" style="height:100%;">
                     <!-- <h2>Notice Board</h2> -->
                     <input name="title" placeholder="Title" style="height: 50%; width: 100%; padding: 1%; margin: 1%;"></input>
                     <textarea name="statement" placeholder="Statement" style="height: 600%; width: 100%; padding: 1%; margin: 1%;"></textarea>
-                    <!-- <div id="ed">
-                        <label>Delete Statement:</label>
-                        <input type="text" name="selector" placeholder="Enter SN of statement">
-                    </div> -->
+                    
                     <div class="button">
                         <button name="submitST">Submit</button>
                         <button name="deleteST">Delete</button>
@@ -327,37 +382,8 @@ $posts=get_post();
                     ?>
                     </details>
                 </form>
-                <!-- <div  id="feedback" style="display: none;">
-                    <?php
-                    $select="SELECT * FROM src_Feedback";
-                    $sel=$conn->query($select);
-                    $n=0;
-                    echo"<h2>Feedbacks</h2>";
-                    foreach ($sel as $info){
-                        $n+=1;
-                        if (!empty($info['Feedback'])){
-                        echo<<<EOT
-                            <div align="left" style="width: 80%; padding: 2% 2% 0 2%; margin: 0 5% 0 5%; overflow-wrap: break-word;"><p>$n. $info[Feedback]</p></div>
-                        EOT;}
-                    }
-                    ?>
-                </div> -->
          </div>
-    <script src="nav.js" type="text/javascript"></script>
-    <script src="canvasjs.min.js"></script>
-    <!-- <script>
-        const state=document.getElementById('state');
-        const feedback=document.getElementById('feedback');
-
-        document.getElementById('Bstate').addEventListener('click', function(){
-            state.style.display="flex";
-            feedback.style.display="none";
-        })
-
-        document.getElementById('Bfeedback').addEventListener('click', function(){
-            state.style.display="none";
-            feedback.style.display="block";
-        })
-    </script> -->
+    <script src=<?php echo ($Domain."nav.js"); ?> type="text/javascript"></script>
+    <script src=<?php echo ($Domain."canvasjs.min.js"); ?>></script>
 </body>
 </html>

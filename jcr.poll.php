@@ -1,4 +1,5 @@
 <?php
+$dom = "jcr";
 session_start();
 
 if (isset($_GET['token']) && isset($_GET['time']) && isset($_GET['hash'])){
@@ -30,6 +31,7 @@ foreach($posts as $post){
     $postID[] = $b;
     $c = "jc".$post['POST'];
     $postContentID[] = $c;
+    $number_of_position = sizeof($postID);
     echo"
     <script>
         postButtonID.push('$a');
@@ -68,12 +70,12 @@ foreach($posts as $post){
             <button type="submit" name="signIn">Log In</button>
         </form>
         <div class="im">
-            <marquee><img src="images/m.jpeg" width="250" class="simg"></marquee>
-            <img src="images/c7.jpeg" width="150" class="simg">
+            <!-- <marquee><img src="images/m.jpeg" width="250" class="simg"></marquee>
+            <img src="images/c7.jpeg" width="150" class="simg"> -->
         </div>
     </div>
 
-    <div class="wrapper" id="poll" style="justify-content: center;"> <!--display:none;">-->
+    <div class="wrapper" id="poll" style="justify-content: center; display:none;">
         <div class="ps" id="post">
             <h2>JCR</h2>
             <h2>Positions</h2>
@@ -93,8 +95,14 @@ foreach($posts as $post){
                 }
             ?>
             <form action="jfunc.php" method="post">
-             <button class="submit" name="jsave_choice" style="width: 60px">Submit</button>
-             <input type="hidden" name="array" id="array">
+                <button class="submit" name="jsave_choice" disabled style="width: 100%; padding:5px">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-check-big w-16 h-16 text-green-500 mx-auto mb-4" aria-hidden="true">
+                    <path d="m9 12 2 2 4-4"></path>
+                    <path d="M5 7c0-1.1.9-2 2-2h10a2 2 0 0 1 2 2v12H5V7Z"></path>
+                    <path d="M22 19H2"></path></svg>
+                    <h3 width="24" height="24">Submit Ballot</h3>
+                </button>
+                <input type="hidden" name="array" id="array">
             </form>
         </div>
 
@@ -109,7 +117,8 @@ foreach($posts as $post){
                 echo <<<EOT
                     <div class="pv" id= $postContent style="display: $display;">
                         <div id="waterm" style="background-image: url('images/j1.jpeg');"></div>
-                        <h2>$DPost[$i]</h2> 
+                        <h2>$DPost[$i]</h2>
+                    <progress class="progress" max=$number_of_position value="0" style="width:60%; accent-color: #047513;"></progress>
                 EOT;
                         sort_candidate($Post[$i]);
                 echo <<<EOT
@@ -119,11 +128,30 @@ foreach($posts as $post){
                             save_C($Post[$i]);
                 echo <<<EOT
                         </div>
+                            <button class="view-summary" onclick="view_summary('flex')">View Summary</button>
+                            <h6>view before submit</h6>
                     </div>
                 EOT;
                 $i++;
             }
         ?>
+
+        <div class="pv" id="view-summary" style="display: none;">
+            <div id="waterm" style="background-image: url('images/s1.jpeg');"></div>
+            <h2>View Summary</h2>
+            <div class="summary-content">
+                <div id="summary">
+                    <div class="summary-position">
+                        <h4 class="position-name">President</h4>
+                        <div class="candidates-row">
+                            <img src="images/c4.jpeg" class="candidate-img" width="50" height="50" alt="Candidate"/>
+                            <h5 class="candidate-name">-------------------</h5>
+                        </div>
+                    </div>
+                </div>
+                <button style = " margin:10px; " class="view-summary" onclick="view_summary('none')" ><h3>👈</h3> Back</button>
+            </div>
+        </div>
         
     </div>
 

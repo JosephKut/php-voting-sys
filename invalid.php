@@ -14,7 +14,8 @@
     <div class="wrapper">
         <div class="pv">
             <div id="waterm"></div>
-            <h1>Link Invalid!</h1>
+                <h1 style="color:green;">🚩❌❗</h1>
+                <h1>Link Invalid!</h1>
             </div>
         </div>
     </div>

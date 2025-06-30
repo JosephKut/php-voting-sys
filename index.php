@@ -13,10 +13,6 @@
     </style>
 </head>
 <body>
-    <ul>
-        <li></li>
-        <!-- <li><img src="images/u9.PNG"></li> -->
-    </ul>
     <div class="login-wrapper" id="log-flex">
         <form method="post" action="ad.authentication.php">
             <h2>Login</h2>
@@ -30,6 +26,8 @@
             </div>
             <button type="submit" name="login">Log In</button>
         </form>
+        <div class="im">
+        </div>
     </div>
 </body>
 </html>

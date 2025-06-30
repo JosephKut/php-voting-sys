@@ -13,8 +13,8 @@ $mail->SMTPAuth = true;
 $mail->Host = 'smtp.gmail.com';
 $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
 $mail->Port = 587;
-$mail->Username = 'josephkuttor730@gmail.com';
-$mail->Password = 'rguyjrffefpcuzua';
+$mail->Username = 'sa@ghprofit.com';
+$mail->Password = 'S-_K!aD_Kdv%';
 
 $mail->setFrom($mail->Username, $From);
 $mail->addAddress($To);

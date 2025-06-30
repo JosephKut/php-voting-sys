@@ -1,140 +1,169 @@
 <?php
-
 include 'connect.php';
 include 'resources.php';
 
-if (isset($_POST['Report'])){
-    require_once('C:/tcpdf/tcpdf.php');
-    $pdf=new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
-    
-    $pdf->AddPage();
-    $pdf->SetFont('Helvetica', '', 12,);
-    $year = date('Y');
+$get = "SELECT * FROM jcr_session";
+$session = $conn->query($get);
+$ses = $session->fetch_assoc();
 
-    $pdf->Write(5,'UNIVERSITY OF MINES AND TECHONOLOGY, ESSIKADO
-SCHOOL OF RAILWAY AND INFRUSTRACTURE DEVELOPMENT',1,);
-    $pdf -> Ln();
-    $pdf -> Ln();
-    $pdf->Cell(0, 10, "UMAT ELECTORAL COMMISSION, JCR REPORT($year).", 1, 1, 'C');
-    $pdf -> Ln();
+// --- Helper Functions ---
 
-    $pdf->Cell(40, 10, 'Session', 0, 0, 'C');
-    $pdf->Cell(70, 10, '', 0, 0, 'C');
-    $pdf->Cell(60, 10, 'Voters', 0, 1, 'C');
-
-    $pdf->Cell(20, 10, 'Start:', 0, 0, 'L');
-    $pdf->Cell(20, 10, date('Y-m-d H:i'), 0, 0, 'L');
-    $pdf->Cell(70, 10, '', 0, 0, 'C');
-    $pdf->Cell(40, 10, 'Registered Voters:', 0, 0, 'L');
-    $pdf->Cell(20, 10, $_POST['voters']."     100%", 0, 1, 'L');
-
-    $cast = ($_POST['voted']/$_POST['voters'])*100;
-    $pcast = number_format($cast,2);
-
-    $pdf->Cell(20, 10, 'End:', 0, 0, 'L');
-    $pdf->Cell(20, 10, date('Y-m-d H:i'),0, 0, 'L');
-    $pdf->Cell(70, 10, '', 0, 0, 'C');
-    $pdf->Cell(40, 10, 'Votes Cast:', 0, 0, 'L');
-    $pdf->Cell(20, 10, $_POST['voted']."   " .$pcast ."%", 0, 1, 'L');
-
-    $pdf -> Ln();
-    $pdf->Cell(0, 10, 'RESULTS', 0, 0, 'C');
-
-    function get_post(){
-        include 'connect.php';
-        $getPost="SELECT POST FROM jcr_post";
-        $format=$conn->query($getPost);
-        $row=$format->fetch_assoc();
-        foreach($format as $Pin){
-            $list[]=$Pin;   
-        }
-        return $list;
+function get_post($conn) {
+    $getPost = "SELECT POST FROM jcr_post";
+    $format = $conn->query($getPost);
+    $list = [];
+    foreach ($format as $Pin) {
+        $list[] = $Pin;
     }
-    $posts=get_post();
+    return $list;
+}
 
-    function sort_result($pdf,$VP){
-        include 'connect.php';
-        $table_check="SHOW TABLES LIKE '$VP'";
-        $table=$conn->query($table_check);
-        if ($table->num_rows>0){
-            $pdf -> Ln();
-            //$pdf -> Ln();
-            $pdf->Cell(0, 10, strtoupper($VP), 0, 1, 'C');
-            $pdf->Cell(50, 10, 'PASSPORT', 0, 0, 'C');
-            $pdf->Cell(80, 10, 'NAME', 0, 0, 'C');
-            $pdf->Cell(50, 10, 'RESULT:  Fig.         Per      ', 0, 1, 'C');
-            $getcandidates="SELECT * FROM jcr_candidate WHERE Post='$VP'";
-            $result=$conn->query($getcandidates);
-            $getPost="SELECT * FROM jcr_post WHERE Post='$VP'";
-            $format=$conn->query($getPost);
-            $row=$format->fetch_assoc();
-            $n=1;
-            $N=2;
-            $votes="SELECT * FROM $VP";
-            $votes_n=$conn->query($votes);
-            $No_votes=$votes_n->num_rows;
+function sort_result($pdf, $VP, $conn) {
+    $table_check = "SHOW TABLES LIKE '$VP'";
+    $Query = "SELECT * FROM jcr_result WHERE Position='$VP'";
+    $data = $conn->query($Query);
+    $get = $data->fetch_assoc();
+    $table = $conn->query($table_check);
 
-            if ("Multi-Voting"==$row['Type']){
-                foreach($result as $Pin){
-                    $getresult="SELECT * FROM $VP WHERE Candidate='$Pin[Full_Name]'";
-                    $poll=$conn->query($getresult);
-                    $pollC=$poll->num_rows;
-                    $pdf->Cell(50, 35, $pdf->Image($Pin['Image'],'','',40,30), 0, 0, 'C');
-                    $pdf->Cell(80, 35, $Pin['Full_Name'], 0, 0, 'C');
-                    $pdf->Cell(50, 35, $pollC.'          '.number_format(($pollC/$No_votes)*100,2).'%', 0, 0, 'R');
-                    $pdf->Ln();
-                }
-            }
-            elseif ("Referendum"==$row['Type']) {
-                foreach($result as $Pin){
-                    $getresult="SELECT * FROM $VP WHERE jcr_Candidate='$Pin[Full_Name]' AND Votes='1'";
-                    $poll=$conn->query($getresult);
-                    $pollC=$poll->num_rows;
-                    $getresult2="SELECT * FROM $VP WHERE jcr_Candidate='$Pin[Full_Name]' AND Votes='2'";
-                    $poll2=$conn->query($getresult2);
-                    $pollC2=$poll2->num_rows;
-                    $pdf->Cell(50, 35, $pdf->Image($Pin['Image'],'','',40,30), 0, 0, 'C');
-                    $pdf->Cell(80, 35, $Pin['Full_Name'], 0, 0, 'C');
-                    $pdf->MultiCell(50, 35, '
+    if ($table->num_rows > 0) {
+        $v = str_replace("_", " ", substr($VP, 4));
+        // Position Header
+        $pdf->SetFont('helvetica', 'B', 12);
+        $pdf->SetFillColor(230, 230, 230);
+        $pdf->Cell(0, 10, strtoupper($v), 0, 1, 'C', 1);
+        
+        // Table header
+        $pdf->SetFont('helvetica', 'B', 11);
+        $pdf->SetFillColor(240, 240, 240);
+        $pdf->Cell(55, 8, 'PASSPORT', 1, 0, 'C', 1);
+        $pdf->Cell(80, 8, 'NAME', 1, 0, 'C', 1);
+        $pdf->Cell(55, 8, 'RESULT:  Fig.         Per', 1, 1, 'C', 1);
+        $pdf->Ln();
+        $votes = "SELECT * FROM $VP";
+        $votes_n = $conn->query($votes);
+        $No_votes = $votes_n->num_rows;
 
-Yes:         '.$pollC.'        '.number_format(($pollC/$No_votes)*100,2).'%
-No:        '.$pollC2.'        '.number_format(($pollC2/$No_votes)*100,2).'%', 0, 'C');
-                    $pdf->Ln();
-                }
-            }
-        }
-    }
-
-    foreach($posts as $post){
-        sort_result($pdf,$post['POST']);   
-    }
-
-    /* $pdf->Cell(0, 10, "VOTER'S FEEDBACK", 0, 1, 'C');
-        $select="SELECT * FROM Feedback";
-        $sel=$conn->query($select);
-        $n=0;
-        foreach ($sel as $info){
-            $n+=1;
-            if (!empty($info['Feedback'])){
-                $pdf->MultiCell(0, 10,'   '.$n.'. '. $info['Feedback'],0,'L');
+        if ("Multi-Voting" == $get['Type']) {
+            $results = json_decode($get['Results']);
+            foreach ($results as $Pin) {
+                $pdf->Cell(50, 35, $pdf->Image($Pin->image, '', '', 40, 30), 0, 0, 'C');
+                $pdf->Cell(80, 35, $Pin->name, 0, 0, 'C');
+                $pdf->Cell(50, 35, $Pin->results . '          ' . (($No_votes != 0) ? number_format(($Pin->results / $No_votes) * 100, 2) : 0) . '%', 0, 0, 'R');
                 $pdf->Ln();
-                }
-        }
-    $pdf->Ln();*/
-
-    $pdf->Cell(0, 10, "EC STATEMENT", 0, 1, 'C');
-        $select="SELECT * FROM jcr_ec_statement";
-        $sel=$conn->query($select);
-        foreach ($sel as $info){
-            if (!empty($info['Title'])){
-                $pdf->Cell(0, 10,$info['Title'],0,1,'C');
             }
-            if (!empty($info['Statement'])){
-                $pdf->Cell(0, 10,$info['Statement'],0,1,'L');
+        } elseif ("Referendum" == $get['Type']) {
+            $results = json_decode($get['Results']);
+            foreach ($results as $Pin) {
+                $pdf->Cell(50, 35, $pdf->Image($Pin->image, '', '', 40, 30), 0, 0, 'C');
+                $pdf->Cell(80, 35, $Pin->name, 0, 0, 'C');
+                $pdf->MultiCell(50, 35,
+                    "Yes:  {$Pin->results_y}   " . (($No_votes != 0) ? number_format(($Pin->results_y / $No_votes) * 100, 2) : 0) . "%\n" .
+                    "No:   {$Pin->results_n}   " . (($No_votes != 0) ? number_format(($Pin->results_n / $No_votes) * 100, 2) : 0) . "%",
+                    0, 'C'
+                );
+                $pdf->Ln();
             }
         }
+    }
+}
 
-    $pdf->Output('example.pdf','I');
+// --- Main PDF Generation ---
+
+if (isset($_POST['Report'])) {
+    require_once('C:/tcpdf/tcpdf.php');
+    $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+
+    // --- Cover Page ---
+    $pdf->AddPage();
+    // Add logo if available
+    // $pdf->Image('path/to/logo.png', 80, 20, 50, '', '', '', '', false, 300);
+
+    $pdf->SetFont('helvetica', 'B', 20);
+    $pdf->Ln(30);
+    $pdf->Cell(0, 15, "UNIVERSITY OF MINES AND TECHNOLOGY", 0, 1, 'C');
+    $pdf->SetFont('helvetica', '', 16);
+    $pdf->Cell(0, 10, "School of Railway and Infrastructure Development", 0, 1, 'C');
+    $pdf->Ln(10);
+    $pdf->SetFont('helvetica', 'B', 18);
+    $pdf->SetTextColor(15, 146, 221);
+    $pdf->Cell(0, 12, "JCR ELECTION REPORT", 0, 1, 'C');
+    $pdf->SetTextColor(0,0,0);
+    $pdf->SetFont('helvetica', '', 14);
+    $pdf->Cell(0, 10, "Year: " . date('Y'), 0, 1, 'C');
+    $pdf->Ln(40);
+    $pdf->SetFont('helvetica', 'I', 12);
+    $pdf->Cell(0, 10, "Prepared by: UMAT Electoral Commission", 0, 1, 'C');
+    $pdf->Ln(10);
+    $pdf->Cell(0, 10, "Date: " . date('F d, Y'), 0, 1, 'C');
+
+    // Add a new page for the report content
+    $pdf->AddPage();
+
+    // --- Session and Voters Info ---
+    $pdf->SetFont('helvetica', 'B', 14);
+    $pdf->SetFillColor(15, 146, 221);
+    $pdf->SetTextColor(255,255,255);
+    $pdf->Cell(0, 12, "SESSION SUMMARY", 0, 1, 'C', 1);
+    $pdf->SetTextColor(0,0,0);
+    $pdf->Ln(4);
+
+    $pdf->SetFont('helvetica', '', 12);
+    $pdf->Cell(40, 8, 'Session:', 0, 0, 'L');
+    $pdf->Cell(60, 8, $ses['begin'] . " - " . $ses['end'], 0, 1, 'L');
+    $pdf->Cell(40, 8, 'Registered Voters:', 0, 0, 'L');
+    $pdf->Cell(60, 8, $_POST['voters'] . " (100%)", 0, 1, 'L');
+    $cast = ($_POST['voters'] != 0) ? number_format(($_POST['voted'] / $_POST['voters']) * 100, 2) : 0;
+    $pcast = number_format($cast, 2);
+    $pdf->Cell(40, 8, 'Votes Cast:', 0, 0, 'L');
+    $pdf->Cell(60, 8, $_POST['voted'] . " ($pcast%)", 0, 1, 'L');
+    $pdf->Ln(8);
+
+    // --- Results Section ---
+    $pdf->SetFont('helvetica', 'B', 14);
+    $pdf->SetFillColor(101, 245, 120);
+    $pdf->Cell(0, 12, 'ELECTION RESULTS', 0, 1, 'C', 1);
+    $pdf->Ln(2);
+
+    $posts = get_post($conn);
+    foreach ($posts as $post) {
+        // Table body
+        $pdf->SetFont('helvetica', '', 11);
+        sort_result($pdf, $post['POST'], $conn);
+        $pdf->Ln(3);
+    }
+
+    // --- EC Statement Section ---
+    $pdf->AddPage();
+    $pdf->SetFont('helvetica', 'B', 14);
+    $pdf->SetFillColor(15, 146, 221);
+    $pdf->SetTextColor(255,255,255);
+    $pdf->Cell(0, 12, "EC STATEMENT", 0, 1, 'C', 1);
+    $pdf->SetTextColor(0,0,0);
+    $pdf->Ln(4);
+
+    $select = "SELECT * FROM jcr_ec_statement";
+    $sel = $conn->query($select);
+    $pdf->SetFont('helvetica', '', 12);
+    foreach ($sel as $info) {
+        if (!empty($info['Title'])) {
+            $pdf->SetFont('helvetica', 'B', 12);
+            $pdf->Cell(0, 8, $info['Title'], 0, 1, 'C');
+        }
+        if (!empty($info['Statement'])) {
+            $pdf->SetFont('helvetica', '', 12);
+            $pdf->MultiCell(0, 8, $info['Statement'], 0, 'L');
+            $pdf->Ln(2);
+        }
+    }
+
+    $pdf->SetFont('helvetica', 'B', 14);
+    $pdf->Cell(0, 12, "_________________________", 0, 1, 'R', 0);
+    $pdf->Cell(0, 12, "_________________________", 0, 1, 'R', 0);
+    $pdf->Cell(0, 12, "_________________________", 0, 1, 'R', 0);
+    $pdf->Ln(4);
+
+    // --- Output PDF ---
+    $pdf->Output('jcr_report.pdf', 'I');
 }
 
 if (isset($_POST['Reset'])){
@@ -174,59 +203,6 @@ if (isset($_POST['verify'])){
         EOT;
     }
 }
-
-/*if (isset($_POST['Backup'])){
-    echo "Fred";
-    $backup_file = 'backup.sql';
-    // $command = "mysqldump -h $host -u $user -p $pass $dbs > $backup_file";
-    // exec($command);
-    $table = array();
-    $result = $con->query("SHOW TABLES");
-
-    while ($row = $result->fetch_row()) {
-        $tables[] = $row[0];
-    }
-
-    $fp = fopen($backup_file, 'w');
-
-    foreach ($tables as $table){
-        $result = $con->query("SELECT * FROM $table");
-
-        $fields = array();
-        $fields_num = $result->field_count;
-
-        for ($i = 0; $i < $fields_num; $i++){
-            $field = $result->fetch_field();
-            $fields = $field->name;
-        }
-
-        fwrite($fp, "DROP TABLE IF EXISTS $table;\n");
-        fwrite($fp, "CREATE TABLE $table;\n");
-
-        for($i = 0; $i < $fields_num; $i++){
-            $fields = $result->fetch_field();
-            fwrite($fp, "$field->name $field->type");
-            if ($i < $fields_num -  1){
-                fwrite($fp, ",");
-            }
-            fwrite($fp, "\n");
-        }
-
-        fwrite($fp, ");\n");
-        fwrite($fp, "INSERT INTO $table VALUES ");
-
-        while ($row = $result->fetch_row()) {
-            $entry = '';
-            foreach ($row as $value){
-                $entry .= "'$value',";
-            }
-            $entry = substr($entry, 0,-1);
-            fwrite($fp, "($entry),\n");
-        }
-        fwrite($fp, ";\n\n");
-    }
-    fclose($fp);
-}*/
 
 if (isset($_POST['jaddP'])){
     //$postId=$_POST['postId'];
@@ -434,7 +410,7 @@ if (isset($_POST['jdeletC'])){
             }
         }
     
-        function get_temp_link($stmail,$stun,$url="jcr.poll.php",$ex=3600){
+        function get_temp_link($stmail,$stun,$ex=14400,$url="jcr.poll.php"){
             include 'resources.php';
             // ...existing code...
             if (session_status() === PHP_SESSION_NONE) {
@@ -450,10 +426,14 @@ if (isset($_POST['jdeletC'])){
         }
     
     if (isset($_POST['jsst'])){
+        $duration = $_POST['duration'];
+        $duration_s = $duration * 3600;
         $table_check="SHOW TABLES LIKE 'jcr_session'";
         $table=$conn->query($table_check);
         if ($table->num_rows>0){
-            $insert="UPDATE jcr_session SET session='start' WHERE session='start' OR session='stop'";
+            include 'links.php';
+            $time = date('Y-m-d H:i:s');
+            $insert="UPDATE jcr_session SET status = 1, begin = '$time', duration = '$duration_s' WHERE session = 'start'";
             
                     $sql="SELECT Student_Email FROM voters";
                     $result=$conn->query($sql);
@@ -467,14 +447,31 @@ if (isset($_POST['jdeletC'])){
                     $SuccessMsg = "sent";
                     $FailedMsg = "failed";
 
+                    $i == 0;
+                    function no_of_voters(){
+                        include 'connect.php';
+                        $getVoters="SELECT * FROM voters";
+                        $result=$conn->query($getVoters);
+                        $Voters=$result->num_rows;
+                        return $Voters;
+                    }
+                    $voters = no_of_voters();
                     foreach ($email as $To){
-                        echo "<script>console.log('$To');</script>";
+                        $per = ($voters != 0) ? number_format(($i / $voters) * 100, 2) : 0;
+                        echo <<<EOT
+                            <script>
+                                document.getElementById('links_sent').textContent="links sent: "$i;
+                                document.getElementById('links_per').textContent="voters: "$per"%";
+                                document.getElementById('links_per').style.width= $per%";
+                            </script>
+                        EOT;
+                        $i++;
                         $msg=random_int(1000,9999);
                         $key="SRID.JCR.".$msg;
 
-                        $_SESSION['jlink']=get_temp_link($To,$key);
+                        $_SESSION['jlink']=get_temp_link($To,$key,$duration_s);
                             
-                        $Body ="<p>Click on this link: <a href='$_SESSION[jlink]'> JCR Poll </a> to take part in the SRC election.</p>
+                        $Body ="<p>Click on this link: <a href='$_SESSION[jlink]'> JCR Poll </a> to take part in the JCR election.</p>
                         <p>This ' $key '  would be your unique code for the election.</p>
                         <p>Use your student email account and the unique code to login and cast your vote.</p>
                         <p>You would receive an email after done voting to affirm your vote has been cast successfully.</p>";
@@ -505,8 +502,16 @@ if (isset($_POST['jdeletC'])){
                     header("location: ad.jcr.php?Login=success");
         }else{
             $create_table="CREATE TABLE jcr_session(
-                session VARCHAR(5) NOT NULL)";
+                session VARCHAR(5),
+                begin TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                end TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                status INT(1) NOT NULL,
+                `release` INT(1) NOT NULL)
+                duration INT(10)";
+            $insert = "INSERT INTO jcr_session(session, begin, end, status, `release`)
+                        VALUES ('start','','',0,0)";
             $conn->query($create_table);
+            $conn->query($insert);
             header("location: ad.jcr.php?Login=success");
         }
     }
@@ -516,15 +521,89 @@ if (isset($_POST['jdeletC'])){
         $table_check="SHOW TABLES LIKE 'jcr_session'";
         $table=$conn->query($table_check);
         if ($table->num_rows>0){
-            $insert="UPDATE jcr_session SET session='stop' WHERE session='start' OR session='stop'";
+            $time = date('Y-m-d H:i:s');
+            $insert="UPDATE jcr_session SET status = 0, end = '$time' WHERE session = 'start'";
             $conn->query($insert);
             header("location: ad.jcr.php?Login=success");
         }else{
             $create_table="CREATE TABLE jcr_session(
-                session VARCHAR(5) NOT NULL)";
+                session VARCHAR(5) DEFAULT 'start',
+                begin TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                end TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                status INT(1) NOT NULL,
+                release INT(1) NOT NULL)";
+            $insert = "INSERT INTO jcr_session(session, begin, end, status, `release`)
+                        VALUES ('start','00:00:00','00:00:00',0,0)";
             $conn->query($create_table);
+            $conn->query($insert);
             header("location: ad.jcr.php?Login=success");
         }
+    }
+
+    if (isset($_POST['release_result'])){
+        $get_s="SELECT * FROM jcr_session";
+        $session=$conn->query($get_s);
+        $ses=$session->fetch_assoc();
+        if ($ses['release']== 1){
+            $insert="UPDATE jcr_session SET `release` = 0 WHERE session = 'start'";
+        }else{
+            $insert="UPDATE jcr_session SET `release` = 1 WHERE session = 'start'";
+        }
+        $stmt = $conn->prepare($insert);
+        $stmt->execute();
+        $conn->query("DELETE FROM jcr_result");
+        $getPost="SELECT POST FROM jcr_post";
+        $format=$conn->query($getPost);
+        $row=$format->fetch_assoc();
+        foreach($format as $VP){
+            
+            $VP = $VP['POST'];
+            $table_check="SHOW TABLES LIKE '$VP'";
+            $table=$conn->query($table_check);
+            if ($table->num_rows>0){
+                $getcandidates="SELECT * FROM jcr_candidate WHERE Post='$VP'";
+                $result=$conn->query($getcandidates);
+                $getPost="SELECT * FROM jcr_post WHERE Post='$VP'";
+                $format=$conn->query($getPost);
+                $row=$format->fetch_assoc();
+                $results = array();
+
+                if ("Multi-Voting"==$row['Type']){
+                    foreach($result as $Pin){
+                        $getresult="SELECT * FROM $VP WHERE Candidate='$Pin[Full_Name]'";
+                        $poll=$conn->query($getresult);
+                        $pollC=$poll->num_rows;
+                        $results[] = array(
+                                            "name" => $Pin['Full_Name'],
+                                            "image" => $Pin['Image'],
+                                            "results" => $pollC
+                                        );
+                    }
+                    print_r($results);
+                }
+                elseif ("Referendum"==$row['Type']) {
+                    foreach($result as $Pin){
+                        $getresult="SELECT * FROM $VP WHERE Candidate='$Pin[Full_Name]' AND Votes='1'";
+                        $poll=$conn->query($getresult);
+                        $pollC=$poll->num_rows;
+                        $getresult2="SELECT * FROM $VP WHERE Candidate='$Pin[Full_Name]' AND Votes='2'";
+                        $poll2=$conn->query($getresult2);
+                        $pollC2=$poll2->num_rows;
+                        $results[] = array(
+                                            "name" => $Pin['Full_Name'],
+                                            "image" => $Pin['Image'],
+                                            "results_y" => $pollC,
+                                            "results_n" => $pollC2
+                                        );
+                    }
+                }
+                $results = json_encode($results);
+                $insertQuery="INSERT INTO jcr_result(Position,Results,Type)
+                        VALUES('$VP','$results','$row[Type]')";
+                $conn->query($insertQuery);
+            }
+        }
+        header("location: ad.jcr.php?Login=success");
     }
 
     if (isset($_POST['submit_feed'])){
@@ -591,7 +670,7 @@ if (isset($_POST['jdeletC'])){
             VALUES('$title','$statement')";
     
         if($conn->query($insertQuery)==True){
-            header("location: ad.src.php?Login=success");
+            header("location: ad.jcr.php?Login=success");
             echo "<script>alert ('Submited');</script>";
         }
         else{
@@ -602,7 +681,7 @@ if (isset($_POST['jdeletC'])){
     if (isset($_POST['deleteST'])){
         $deleteC="DELETE FROM jcr_ec_statement";
         $conn->query($deleteC);
-        header("location: ad.src.php?Login=success");
+        header("location: ad.jcr.php?Login=success");
     }
 
 ?>
