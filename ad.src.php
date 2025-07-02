@@ -120,88 +120,10 @@ $posts=get_post();
         <div class="content" id="voters" style="display: none;">
             <?php include 'voters.php';?>
         </div>
-        <div class="content" id="not_sent" style="display: none;" >
-            <div class="table-section">
-            <div class="table-container">
-                <table class="voters-table">
-                    <thead>
-                        <tr>
-                            <th colspan="5"><h3>Voters Yet To Receive Link</h3></th>
-                        </tr>
-                        <tr>
-                            <th>Index_No</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Programme</th>
-                            <th>Contact</th>
-                        </tr>
-                </thead>
-                <tbody>
-                <?php
-                    $getVoters="SELECT * FROM voters";
-                    $result=$conn->query($getVoters);
-                    foreach($result as $Pin){
-                        $getVoters="SELECT * FROM src_sent_links WHERE Student_Email ='$Pin[Student_Email]'";
-                        $status=$conn->query($getVoters);
-                        if($status->num_rows > 0){
-                            continue; // Skip if the voter has already recieved link
-                        }
-                        echo "
-                        <tr>
-                            <td>$Pin[Index_No]</td>
-                            <td>$Pin[Last_Name] $Pin[Other_Name]</td>
-                            <td>$Pin[Student_Email]</td>
-                            <td>$Pin[Programme]</td>
-                            <td>$Pin[Tel]</td>
-                        </tr>";
-                    }
-                ?>
-                </tbody>
-                </table>
-            </div>
-            </div>
-        </div>
-        <div class="content" id="voted" style="display: none;" >
-            <div class="table-section">
-            <div class="table-container">
-                <table class="voters-table">
-                    <thead>
-                <tr>
-                    <th colspan="6"><h3>Voted List</h3></th>
-                </tr>
-                <tr>
-                    <th>Index_No</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Programme</th>
-                    <th>Contact</th>
-                    <th>Time</th>
-                </tr>
-                <tbody>
-                <?php
-                    $getVoted="SELECT * FROM voters";
-                    $result=$conn->query($getVoted);
-                    foreach($result as $Pin){
-                        $getVotes="SELECT * FROM src_votes WHERE Student_Email ='$Pin[Student_Email]'";
-                        $status=$conn->query($getVotes);
-                        if($status->num_rows > 0){
-                            echo "
-                            <tr>
-                                <td>$Pin[Index_No]</td>
-                                <td>$Pin[Last_Name] $Pin[Other_Name]</td>
-                                <td>$Pin[Student_Email]</td>
-                                <td>$Pin[Programme]</td>
-                                <td>$Pin[Tel]</td>
-                                <td>$status[time]</td>
-                            </tr>";
-                        }
-                    }
-                ?>
-                </tbody>
-                </table>
-            </div>
-            </div>
-        </div>
+
+        <?php $dom = 'src';
+         include 'tables.php';?>
+        
         <div class="content" id="postM" style="display: none;">
             <form action="src.php" method="post">
                 <h2>Post Management</h2>
@@ -273,28 +195,32 @@ $posts=get_post();
         </div>
 
         <div class="content" id="viewC" style="display: none;">
-        <table >
-                 <tr>
-                     <th colspan="3">Positions</th>
-                 </tr>
-                 <tr>
-                     <th>Post Id</th>
-                     <th>Post</th>
-                     <th>Type</th>
-                 </tr>
-                 <?php
-                    $getPost="SELECT * FROM src_post";
-                    $result=$conn->query($getPost);
-                    foreach($result as $Pin){
-                    $Position = str_replace("_"," ",substr($Pin['Post'],4));
-                    echo "
+            <table class="voters-table">
+                <thead>
                     <tr>
-                        <td>$Pin[Post_id]</td>
-                        <td>$Position</td>
-                        <td>$Pin[Type]</td>
-                    </tr>";}
-                 ?>
-             </table>
+                        <th colspan="3">Positions</th>
+                    </tr>
+                    <tr>
+                        <th>Post Id</th>
+                        <th>Post</th>
+                        <th>Type</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                        $getPost="SELECT * FROM src_post";
+                        $result=$conn->query($getPost);
+                        foreach($result as $Pin){
+                        $Position = str_replace("_"," ",substr($Pin['Post'],4));
+                        echo "
+                        <tr style='color: white;'>
+                            <td>$Pin[Post_id]</td>
+                            <td>$Position</td>
+                            <td>$Pin[Type]</td>
+                        </tr>";}
+                    ?>
+                </tbody>
+            </table>
              <?php
                 display_post();
              ?>

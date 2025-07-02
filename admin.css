@@ -356,6 +356,56 @@ form h2{
     border-radius: 4px;
 }
 
+.search-container {
+    padding: 10px;
+    /* background: rgba(225, 225, 225, 0.15); */
+    color: white;
+}
+
+.search-box {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.search-input {
+    flex: 1;
+    min-width: 300px;
+    padding: 12px 15px;
+    border: none;
+    border-radius: 25px;
+    font-size: 16px;
+    outline: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.search-input:focus {
+    box-shadow: 0 0 0 3px rgba(255,255,255,0.3);
+}
+
+.clear-btn {
+    background: rgba(255,255,255,0.2);
+    color: white;
+    border: 2px solid white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s;
+}
+
+.clear-btn:hover {
+    background: white;
+    color: #667eea;
+}
+
+.search-stats {
+    margin-top: 10px;
+    font-size: 14px;
+    opacity: 0.9;
+}
+
 .selector{
     color: #fff;
     border: 0;

@@ -483,8 +483,12 @@ if (isset($_POST['jdeletC'])){
                             echo "<script>
                                     console.log('Sending mail to $To');
                                 </script>";
+                            $sent = 0;
+                            $trimmed = rtrim($To);
 
-                            include 'mailer.php';
+                            if (str_ends_with($trimmed, '@st.umat.edu.gh')) {
+                                include 'mailer.php';
+                            }
 
                             if($sent) {
                                 $conn->query($insert);

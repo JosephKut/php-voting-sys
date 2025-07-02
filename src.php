@@ -487,8 +487,16 @@ if (isset($_POST['deletC'])){
                             echo "<script>
                                     console.log('Sending mail to $To');
                                 </script>";
-                            
-                            include 'mailer.php';
+                            $sent = 0;
+                            $trimmed = rtrim($To);
+
+                            if (str_ends_with($trimmed, '@st.umat.edu.gh')) {
+                                include 'mailer.php';
+                            }
+                            // $endsWith = substr_compare($trimmed, '.txt', -strlen('.txt')) === 0;
+                            // if ($endsWith) {
+                            //     // String ends with '.txt'
+                            // }
 
                             if($sent == 1){
                                 $conn->query($insert);

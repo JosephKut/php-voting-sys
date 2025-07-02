@@ -10,6 +10,11 @@ if ($_GET['access'] !== $_SESSION['access']){
     header("location: index.php");
     die();
 }
+if (!$_SESSION['Email']){
+    header("location: index.php");
+    session_destroy();
+    die();    
+}
 // config.php - Database configuration
 class DatabaseConfig {
     private $host = 'localhost';
@@ -39,6 +44,7 @@ class ExcelImporter {
     private $db;
     private $allowedExtensions = ['xlsx', 'xls', 'csv'];
     private $maxFileSize = 50 * 1024 * 1024; // 50MB
+    private $requiredEmailDomain = '@st.umat.edu.gh'; // Required email domain
 
     public function __construct() {
         $this->db = new DatabaseConfig();
@@ -130,9 +136,13 @@ class ExcelImporter {
                 if (empty($rowData['Programme'])) $rowErrors[] = 'Programme is required';
                 if (empty($rowData['Tel'])) $rowErrors[] = 'Tel is required';
                 
-                // Validate email format
-                if (!empty($rowData['Student_Email']) && !filter_var($rowData['Student_Email'], FILTER_VALIDATE_EMAIL)) {
-                    $rowErrors[] = 'Invalid email format';
+                // Validate email format and domain
+                if (!empty($rowData['Student_Email'])) {
+                    if (!filter_var($rowData['Student_Email'], FILTER_VALIDATE_EMAIL)) {
+                        $rowErrors[] = 'Invalid email format';
+                    } elseif (!$this->validateEmailDomain($rowData['Student_Email'])) {
+                        $rowErrors[] = 'Email must end with ' . $this->requiredEmailDomain;
+                    }
                 }
 
                 // Check for duplicates in database
@@ -162,6 +172,11 @@ class ExcelImporter {
         } catch (Exception $e) {
             throw new Exception("Error previewing Excel file: " . $e->getMessage());
         }
+    }
+
+    // Validate email domain
+    private function validateEmailDomain($email) {
+        return str_ends_with(strtolower($email), strtolower($this->requiredEmailDomain));
     }
 
     // Get existing Index_No values from database
