@@ -117,7 +117,6 @@ $posts=get_post();
         <div class="content" id="voters" style="display: none;">
             <?php include 'voters.php';?>
         </div>
-                            <th colspan="5"><h3>Voters Yet To Receive Link</h3></th>
         
         <?php $dom = 'jcr';
          include 'tables.php';?>

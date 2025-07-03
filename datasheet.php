@@ -20,7 +20,7 @@ class DatabaseConfig {
     private $host = 'localhost';
     private $username = 'root';
     private $password = 'JK';
-    private $database = 'excel_import_db';
+    private $database = 'umat_src_poll';
     public $conn;
 
     public function __construct() {

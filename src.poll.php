@@ -2,15 +2,15 @@
 $dom = "src";
 session_start();
 
-// if (isset($_GET['token']) && isset($_GET['time']) && isset($_GET['hash'])){
-// $token = $_GET['token'];
-// $time = $_GET['time'];
-// $hash = $_GET['hash'];
-// }
-// else{
-//     include 'invalid.php';
-//     die();
-// }
+if (isset($_GET['token']) && isset($_GET['time']) && isset($_GET['hash'])){
+$token = $_GET['token'];
+$time = $_GET['time'];
+$hash = $_GET['hash'];
+}
+else{
+    include 'invalid.php';
+    die();
+}
 
 include("connect.php");
 include("func.php");
@@ -55,7 +55,7 @@ include("resources.php");
 </head>
 <body>
 
-    <!-- <div class="login-wrapper" id="log-flex" style="display:none;">
+    <div class="login-wrapper" id="log-flex" style="display:none;">
         <form method="post" action=<?php echo $_SERVER['REQUEST_URI']; ?>>
             <h2>Login</h2>
             <div class="input-field">
@@ -72,9 +72,9 @@ include("resources.php");
             <marquee><img src="images/m.jpeg" width="250" class="simg"></marquee>
             <img src="images/c7.jpeg" width="150" class="simg">
         </div>
-    </div> -->
+    </div>
 
-    <div class="wrapper" id="poll" style="justify-content: center;"><!-- display:none;">-->
+    <div class="wrapper" id="poll" style="justify-content: center; display:none;">
         <div class="ps" id="post">
             <h2>SRC</h2>
             <h2>Positions</h2>
@@ -155,7 +155,7 @@ include("resources.php");
         
     </div>
     <script src=<?php echo ($Domain."nav.js");?>></script>
-    <!-- <?php
+    <?php
     if (isset($_POST['Student_Email']) && isset($_POST['Unique_Code'])){
         $Student_Email=$_POST['Student_Email'];
         $Unique_Code=$_POST['Unique_Code'];
@@ -180,6 +180,6 @@ include("resources.php");
         </script>
         EOT;
      }
-    ?> -->
+    ?>
 </body>
 </html>

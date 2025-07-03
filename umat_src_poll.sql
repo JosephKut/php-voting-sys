@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 12, 2025 at 08:40 PM
+-- Generation Time: Jul 03, 2025 at 03:59 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -57,8 +57,16 @@ CREATE TABLE `jcr_candidate` (
   `Full_Name` varchar(100) NOT NULL,
   `Reference_No` int(10) NOT NULL,
   `Post` text NOT NULL,
-  `Image` varchar(225) NOT NULL
+  `Image` varchar(225) NOT NULL,
+  `timestamp` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `jcr_candidate`
+--
+
+INSERT INTO `jcr_candidate` (`Index_No`, `Full_Name`, `Reference_No`, `Post`, `Image`, `timestamp`) VALUES
+('ejk9kjs72', 'Bernard Etuahene', 123456789, 'jcr_President', 'uploads/1000120925.jpg', '2025-06-23 21:26:38');
 
 -- --------------------------------------------------------
 
@@ -153,6 +161,27 @@ CREATE TABLE `jcr_president` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `jcr_result`
+--
+
+CREATE TABLE `jcr_result` (
+  `Position` varchar(100) NOT NULL,
+  `Results` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`Results`)),
+  `Type` varchar(15) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `jcr_result`
+--
+
+INSERT INTO `jcr_result` (`Position`, `Results`, `Type`) VALUES
+('jcr_President', '[{\"name\":\"Bernard Etuahene\",\"image\":\"uploads/1000120925.jpg\",\"results\":0}]', 'Multi-Voting'),
+('jcr_General_Secretary', '[]', 'Multi-Voting'),
+('jcr_Financial_Secretary', '[]', 'Multi-Voting');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `jcr_sent_links`
 --
 
@@ -168,15 +197,20 @@ CREATE TABLE `jcr_sent_links` (
 --
 
 CREATE TABLE `jcr_session` (
-  `session` varchar(5) NOT NULL
+  `session` varchar(5) NOT NULL DEFAULT 'start',
+  `begin` timestamp NOT NULL DEFAULT current_timestamp(),
+  `end` timestamp NOT NULL DEFAULT current_timestamp(),
+  `status` int(1) NOT NULL,
+  `release` int(1) NOT NULL,
+  `duration` int(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `jcr_session`
 --
 
-INSERT INTO `jcr_session` (`session`) VALUES
-('stop');
+INSERT INTO `jcr_session` (`session`, `begin`, `end`, `status`, `release`, `duration`) VALUES
+('start', '2025-06-22 21:22:34', '2025-06-23 06:56:18', 0, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -186,7 +220,8 @@ INSERT INTO `jcr_session` (`session`) VALUES
 
 CREATE TABLE `jcr_votes` (
   `Student_Email` text NOT NULL,
-  `Unique_Code` text NOT NULL
+  `Unique_Code` text NOT NULL,
+  `time` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -200,8 +235,20 @@ CREATE TABLE `src_candidate` (
   `Full_Name` varchar(100) NOT NULL,
   `Reference_No` int(10) NOT NULL,
   `Post` text NOT NULL,
-  `Image` varchar(225) NOT NULL
+  `Image` varchar(225) NOT NULL,
+  `timestamp` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `src_candidate`
+--
+
+INSERT INTO `src_candidate` (`Index_No`, `Full_Name`, `Reference_No`, `Post`, `Image`, `timestamp`) VALUES
+('674890', 'Solomon Quason', 78904, 'src_President', 'uploads/1000120922.jpg', '2025-06-23 21:28:02'),
+('6748967', 'Fred Kuttor', 7890357, 'src_General_Secretary', 'uploads/1000120923.jpg', '2025-06-23 21:28:02'),
+('fgh5367', 'Nana Adjoa', 2147483647, 'src_Womens_Commissioner', 'uploads/1000120920.jpg', '2025-06-23 21:28:02'),
+('kuglhjk', 'Banabas Saint', 898765, 'src_President', 'uploads/1000120925.jpg', '2025-06-23 21:28:02'),
+('yulkj', 'Rashid Mohammed', 345, 'src_General_Secretary', 'uploads/1000120924.jpg', '2025-06-23 21:28:02');
 
 -- --------------------------------------------------------
 
@@ -222,6 +269,44 @@ CREATE TABLE `src_ec_statement` (
 
 CREATE TABLE `src_feedback` (
   `Feedback` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `src_general_secretary`
+--
+
+CREATE TABLE `src_general_secretary` (
+  `Candidate` varchar(50) NOT NULL,
+  `Votes` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `src_general_secretary`
+--
+
+INSERT INTO `src_general_secretary` (`Candidate`, `Votes`) VALUES
+('', '2uploads/1000120924.jpg'),
+('', '2uploads/1000120924.jpg'),
+('', '2uploads/1000120924.jpg'),
+('Rashid Mohammed', '1uploads/1000120923.jpg'),
+('Rashid Mohammed', '1uploads/1000120923.jpg'),
+('Rashid Mohammed', '1uploads/1000120923.jpg'),
+('Fred Kuttor', '1');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `src_log`
+--
+
+CREATE TABLE `src_log` (
+  `id` int(11) NOT NULL,
+  `user_id` varchar(11) NOT NULL,
+  `action` int(11) NOT NULL,
+  `record_id` varchar(17) NOT NULL,
+  `changes` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -264,6 +349,50 @@ INSERT INTO `src_post` (`Post_id`, `Post`, `Type`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `src_president`
+--
+
+CREATE TABLE `src_president` (
+  `Candidate` varchar(50) NOT NULL,
+  `Votes` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `src_president`
+--
+
+INSERT INTO `src_president` (`Candidate`, `Votes`) VALUES
+('Banabas Saint', '1uploads/1000120922.jpg'),
+('Banabas Saint', '1uploads/1000120922.jpg'),
+('', '2uploads/1000120925.jpg'),
+('Banabas Saint', '1uploads/1000120922.jpg'),
+('Banabas Saint', '1uploads/1000120922.jpg'),
+('Banabas Saint', '1uploads/1000120922.jpg'),
+('Solomon Quason', '1');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `src_result`
+--
+
+CREATE TABLE `src_result` (
+  `Position` varchar(100) NOT NULL,
+  `Results` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `Type` varchar(15) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `src_result`
+--
+
+INSERT INTO `src_result` (`Position`, `Results`, `Type`) VALUES
+('src_General_Secretary', '[{\"name\":\"Fred Kuttor\",\"image\":\"uploads/1000120923.jpg\",\"results\":1},{\"name\":\"Rashid Mohammed\",\"image\":\"uploads/1000120924.jpg\",\"results\":3}]', 'Multi-Voting'),
+('src_President', '[{\"name\":\"Solomon Quason\",\"image\":\"uploads/1000120922.jpg\",\"results\":1},{\"name\":\"Banabas Saint\",\"image\":\"uploads/1000120925.jpg\",\"results\":5}]', 'Multi-Voting');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `src_sent_links`
 --
 
@@ -279,15 +408,20 @@ CREATE TABLE `src_sent_links` (
 --
 
 CREATE TABLE `src_session` (
-  `session` varchar(5) NOT NULL
+  `session` varchar(5) NOT NULL DEFAULT 'start',
+  `begin` timestamp NOT NULL DEFAULT current_timestamp(),
+  `end` timestamp NOT NULL DEFAULT current_timestamp(),
+  `status` int(1) NOT NULL,
+  `release` int(1) NOT NULL,
+  `duration` int(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `src_session`
 --
 
-INSERT INTO `src_session` (`session`) VALUES
-('stop');
+INSERT INTO `src_session` (`session`, `begin`, `end`, `status`, `release`, `duration`) VALUES
+('start', '2025-06-22 07:00:00', '2025-06-29 04:10:26', 0, 1, 0);
 
 -- --------------------------------------------------------
 
@@ -297,7 +431,8 @@ INSERT INTO `src_session` (`session`) VALUES
 
 CREATE TABLE `src_votes` (
   `Student_Email` text NOT NULL,
-  `Unique_Code` text NOT NULL
+  `Unique_Code` text NOT NULL,
+  `time` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -310,40 +445,40 @@ CREATE TABLE `voters` (
   `Index_No` varchar(17) NOT NULL,
   `Last_Name` varchar(50) NOT NULL,
   `Other_Name` varchar(50) NOT NULL,
-  `Voters_Id` varchar(10) NOT NULL,
   `Student_Email` varchar(100) NOT NULL,
   `Programme` text NOT NULL,
   `Tel` int(14) NOT NULL,
-  `Password` varchar(100) NOT NULL
+  `date_created` timestamp NOT NULL DEFAULT current_timestamp(),
+  `import_batch` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `voters`
 --
 
-INSERT INTO `voters` (`Index_No`, `Last_Name`, `Other_Name`, `Voters_Id`, `Student_Email`, `Programme`, `Tel`, `Password`) VALUES
-('.', '.', '.', '.', 'agbovimaxwellfosu@gmail.com', '.', 234, 'aa'),
-('..', '.', '.', '..', 'ce-jkkuttor4923@st.umat.edu.gh', '.', 234, 'aa'),
-('a', '.', '.', 'a', 'Ishaneeadom@gmail.com', '.', 234, 'aa'),
-('b', '.', '.', 'b', 'Kalishanee@gmail.com', '.', 234, 'aa'),
-('c', '.', '.', 'c', 'b88849844@gmail.com', '.', 234, 'aa'),
-('d', '.', '.', 'd', 'amegbanuveronica21@gmail.com', '.', 234, 'aa'),
-('e', '.', '.', 'e', 'afuaacquahgyan@gmail.com', '.', 234, 'aa'),
-('f', '.', '.', 'f', 'dennisdacosta770@gmail.com', '.', 234, 'aa'),
-('g', '.', '.', 'g', 'eugenedeku18@gmail.com', '.', 234, 'aa'),
-('h', '.', '.', 'h', 'okyereenestina81@gmail.com', '.', 234, 'aa'),
-('i', '.', '.', 'i', 'Leonardtwumasi777@gmail.com', '.', 234, 'aa'),
-('j', '.', '.', 'j', 'ce-vaantepim0523@st.umat.edu.gh', '.', 234, 'aa'),
-('jkl', 'Christable', 'Boateng', 'w2', 'boatemaaboatengchristable@gmail.com', 'CE', 234, 'aa'),
-('k', '.', '.', 'k', 'Kellyenyonam54@gmail.com', '.', 234, 'aa'),
-('kln', '', '', '', 'boatemaaboatengchristabel@gmail.com', '', 0, ''),
-('l', '.', '.', 'l', 'koomsonefk1@gmail.com', '.', 234, 'aa'),
-('m', '.', '.', 'm', 'ce-gttulasi8523@st.umat.edu.gh', '.', 234, 'aa'),
-('n', '.', '.', 'n', 'tiekusamuel270@gmail.com', '.', 234, 'aa'),
-('p', '.', '.', 'p', 'ce-lbuabassah2221@st.umat.edu.gh', '.', 234, 'aa'),
-('SRI.41.008.113.23', 'KUTTOR', 'KOJO JOSEPH', 'SRID.4575', 'josephkuttor730@gmail.com', 'CE', 531363850, '0b09ae2d0760d3a7d59e7c180cdccd23'),
-('SRI.41.008.119.23', 'KUTTOR', 'JOE', 'SRID.4239', 'ezzy2win@gmail.com', 'MC', 578907658, '21ad0bd836b90d08f4cf640b4c298e7c'),
-('SRI.41.018.119.23', 'TOR', 'JOE', 'SRID.4444', 'wlord820@mail.com', 'MC', 578907656, '40fe9ad4949331a12f5f19b477133924');
+INSERT INTO `voters` (`Index_No`, `Last_Name`, `Other_Name`, `Student_Email`, `Programme`, `Tel`, `date_created`, `import_batch`) VALUES
+('.', '.', '.', 'agbovimaxwellfosu@gmail.com', '.', 234, '2025-06-22 22:20:27', '2025-07-02 15:04:05'),
+('..', '.', '.', 'ce-jkkuttor4923@st.umat.edu.gh', '.', 234, '2025-06-22 22:20:27', '2025-07-02 15:04:05'),
+('a', '.', '.', 'Ishaneeadom@gmail.com', '.', 234, '2025-06-22 22:20:27', '2025-07-02 15:04:05'),
+('b', '.', '.', 'Kalishanee@gmail.com', '.', 234, '2025-06-22 22:20:27', '2025-07-02 15:04:05'),
+('c', '.', '.', 'b88849844@gmail.com', '.', 234, '2025-06-22 22:20:27', '2025-07-02 15:04:05'),
+('d', '.', '.', 'amegbanuveronica21@gmail.com', '.', 234, '2025-06-22 22:20:27', '2025-07-02 15:04:05'),
+('e', '.', '.', 'afuaacquahgyan@gmail.com', '.', 234, '2025-06-22 22:20:27', '2025-07-02 15:04:05'),
+('f', '.', '.', 'dennisdacosta770@gmail.com', '.', 234, '2025-06-22 22:20:27', '2025-07-02 15:04:05'),
+('g', '.', '.', 'eugenedeku18@gmail.com', '.', 234, '2025-06-22 22:20:27', '2025-07-02 15:04:05'),
+('h', '.', '.', 'okyereenestina81@gmail.com', '.', 234, '2025-06-22 22:20:27', '2025-07-02 15:04:05'),
+('i', '.', '.', 'Leonardtwumasi777@gmail.com', '.', 234, '2025-06-22 22:20:27', '2025-07-02 15:04:05'),
+('j', '.', '.', 'ce-vaantepim0523@st.umat.edu.gh', '.', 234, '2025-06-22 22:20:27', '2025-07-02 15:04:05'),
+('jkl', 'Christable', 'Boateng', 'boatemaaboatengchristable@gmail.com', 'CE', 234, '2025-06-22 22:20:27', '2025-07-02 15:04:05'),
+('k', '.', '.', 'Kellyenyonam54@gmail.com', '.', 234, '2025-06-22 22:20:27', '2025-07-02 15:04:05'),
+('kln', '', '', 'boatemaaboatengchristabel@gmail.com', '', 0, '2025-06-22 22:20:27', '2025-07-02 15:04:05'),
+('l', '.', '.', 'koomsonefk1@gmail.com', '.', 234, '2025-06-22 22:20:27', '2025-07-02 15:04:05'),
+('m', '.', '.', 'ce-gttulasi8523@st.umat.edu.gh', '.', 234, '2025-06-22 22:20:27', '2025-07-02 15:04:05'),
+('n', '.', '.', 'tiekusamuel270@gmail.com', '.', 234, '2025-06-22 22:20:27', '2025-07-02 15:04:05'),
+('p', '.', '.', 'ce-lbuabassah2221@st.umat.edu.gh', '.', 234, '2025-06-22 22:20:27', '2025-07-02 15:04:05'),
+('SRI.41.008.113.23', 'KUTTOR', 'KOJO JOSEPH', 'josephkuttor730@gmail.com', 'CE', 531363850, '2025-06-22 22:20:27', '2025-07-02 15:04:05'),
+('SRI.41.008.119.23', 'KUTTOR', 'JOE', 'ezzy2win@gmail.com', 'MC', 578907658, '2025-06-22 22:20:27', '2025-07-02 15:04:05'),
+('SRI.41.018.119.23', 'TOR', 'JOE', 'wlord820@mail.com', 'MC', 578907656, '2025-06-22 22:20:27', '2025-07-02 15:04:05');
 
 --
 -- Indexes for dumped tables
@@ -395,6 +530,12 @@ ALTER TABLE `src_candidate` ADD FULLTEXT KEY `Index_No` (`Index_No`);
 ALTER TABLE `src_candidate` ADD FULLTEXT KEY `Index_No_2` (`Index_No`);
 
 --
+-- Indexes for table `src_log`
+--
+ALTER TABLE `src_log`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `src_nb`
 --
 ALTER TABLE `src_nb`
@@ -407,6 +548,12 @@ ALTER TABLE `src_post`
   ADD UNIQUE KEY `Post_id` (`Post_id`);
 
 --
+-- Indexes for table `src_result`
+--
+ALTER TABLE `src_result`
+  ADD UNIQUE KEY `Position` (`Position`);
+
+--
 -- Indexes for table `src_votes`
 --
 ALTER TABLE `src_votes`
@@ -417,7 +564,6 @@ ALTER TABLE `src_votes`
 --
 ALTER TABLE `voters`
   ADD PRIMARY KEY (`Index_No`),
-  ADD UNIQUE KEY `Reference No.` (`Voters_Id`),
   ADD UNIQUE KEY `Email` (`Student_Email`);
 
 --
@@ -435,6 +581,12 @@ ALTER TABLE `jcr_nb`
 --
 ALTER TABLE `jcr_post`
   MODIFY `Post_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
+-- AUTO_INCREMENT for table `src_log`
+--
+ALTER TABLE `src_log`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `src_nb`

@@ -42,11 +42,22 @@ function sort_result($pdf, $VP, $conn) {
         $votes = "SELECT * FROM $VP";
         $votes_n = $conn->query($votes);
         $No_votes = $votes_n->num_rows;
+        $rowHeight = 35;
+        $imgWidth = 40;
+        $imgHeight = 30;
 
         if ("Multi-Voting" == $get['Type']) {
             $results = json_decode($get['Results']);
             foreach ($results as $Pin) {
-                $pdf->Cell(50, 35, $pdf->Image($Pin->image, '', '', 40, 30), 0, 0, 'C');
+                $x = $pdf->GetX();
+                $y = $pdf->GetY();
+                $pdf->Cell(55, $rowHeight, '', 0, 0, 'C');
+                if (!empty($Pin->image)) {
+                    $imgX = $x + (55 - $imgWidth) / 2;
+                    $imgY = $y + ($rowHeight - $imgHeight) / 2;
+                    $pdf->Image($Pin->image, $imgX, $imgY, $imgWidth, $imgHeight, '', '', '', false, 300, '', false, false, 0);
+                }
+                // $pdf->Cell(50, 35, $pdf->Image($Pin->image, '', '', 40, 30), 0, 0, 'C');
                 $pdf->Cell(80, 35, $Pin->name, 0, 0, 'C');
                 $pdf->Cell(50, 35, $Pin->results . '          ' . (($No_votes != 0) ? number_format(($Pin->results / $No_votes) * 100, 2) : 0) . '%', 0, 0, 'R');
                 $pdf->Ln();
@@ -54,7 +65,14 @@ function sort_result($pdf, $VP, $conn) {
         } elseif ("Referendum" == $get['Type']) {
             $results = json_decode($get['Results']);
             foreach ($results as $Pin) {
-                $pdf->Cell(50, 35, $pdf->Image($Pin->image, '', '', 40, 30), 0, 0, 'C');
+                $x = $pdf->GetX();
+                $y = $pdf->GetY();
+                $pdf->Cell(55, $rowHeight, '', 0, 0, 'C');
+                if (!empty($Pin->image)) {
+                    $imgX = $x + (55 - $imgWidth) / 2;
+                    $imgY = $y + ($rowHeight - $imgHeight) / 2;
+                    $pdf->Image($Pin->image, $imgX, $imgY, $imgWidth, $imgHeight, '', '', '', false, 300, '', false, false, 0);
+                }
                 $pdf->Cell(80, 35, $Pin->name, 0, 0, 'C');
                 $pdf->MultiCell(50, 35,
                     "Yes:  {$Pin->results_y}   " . (($No_votes != 0) ? number_format(($Pin->results_y / $No_votes) * 100, 2) : 0) . "%\n" .
