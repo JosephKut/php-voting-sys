@@ -447,11 +447,20 @@ if (isset($_POST['deletC'])){
     }
     
     if (isset($_POST['sst'])){
-        $duration = $_POST['duration'];
+        $duration = (isset($_POST['duration']) && $_POST['duration'] !== '' && is_numeric($_POST['duration'])) ? (int)$_POST['duration'] : 4;
         $duration_s = $duration * 3600;
         $table_check="SHOW TABLES LIKE 'src_session'";
         $table=$conn->query($table_check);
         if ($table->num_rows>0){
+
+            function no_of_voters(){
+                include 'connect.php';
+                $getVoters="SELECT * FROM voters";
+                $result=$conn->query($getVoters);
+                $Voters=$result->num_rows;
+                return $Voters;
+            }
+            $voters = no_of_voters();
             include 'links.php';
             $time = date('Y-m-d H:i:s');
             $insert="UPDATE src_session SET status=1, begin='$time', duration = '$duration_s' WHERE session='start'";   
@@ -468,22 +477,14 @@ if (isset($_POST['deletC'])){
                     $SuccessMsg = "sent";
                     $FailedMsg = "failed";
 
-                    $i == 0;
-                    function no_of_voters(){
-                        include 'connect.php';
-                        $getVoters="SELECT * FROM voters";
-                        $result=$conn->query($getVoters);
-                        $Voters=$result->num_rows;
-                        return $Voters;
-                    }
-                    $voters = no_of_voters();
+                    $i = 1;
                     foreach ($email as $To) {
-                        $per = ($voters != 0) ? number_format(($i / $voters) * 100, 2) : 0;
+                        $per = number_format(($i / $voters) * 100, 2);
                         echo <<<EOT
                             <script>
-                                document.getElementById('links_sent').textContent="links sent: "$i;
-                                document.getElementById('links_per').textContent="voters: "$per"%";
-                                document.getElementById('links_per').style.width= $per%";
+                                document.getElementById('links_sent').textContent="links sent: $i";
+                                document.getElementById('links_per').textContent="voters: $per%";
+                                document.getElementById('fill').style.width= "$per%";
                             </script>
                         EOT;
                         $i++;
@@ -511,23 +512,15 @@ if (isset($_POST['deletC'])){
                             if (str_ends_with($trimmed, '@st.umat.edu.gh')) {
                                 include 'mailer.php';
                             }
-                            // $endsWith = substr_compare($trimmed, '.txt', -strlen('.txt')) === 0;
-                            // if ($endsWith) {
-                            //     // String ends with '.txt'
-                            // }
 
                             if($sent == 1){
                                 $conn->query($insert);
-                                echo "Mail successful!";
                                 $insertQuery="INSERT INTO src_sent_links(Student_Email,Link_Sent)
                                 VALUES('$To','$_SESSION[slink]')";
                                 $conn->query($insertQuery);
-                            }else {
-                                echo "Mail failed!";
                             }
                         }
-                    }
-            header("location: ad.src.php?Login=success");    
+                    }    
         }else{
             $create_table="CREATE TABLE src_session(
                 session VARCHAR(5),
@@ -540,7 +533,6 @@ if (isset($_POST['deletC'])){
                         VALUES ('start','','',0,0)";
             $conn->query($create_table);
             $conn->query($insert);
-            header("location: ad.src.php?Login=success");
         }
     }
 

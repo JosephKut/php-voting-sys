@@ -443,11 +443,20 @@ if (isset($_POST['jdeletC'])){
         }
     
     if (isset($_POST['jsst'])){
-        $duration = $_POST['duration'];
+        $duration = (isset($_POST['duration']) && $_POST['duration'] !== '' && is_numeric($_POST['duration'])) ? (int)$_POST['duration'] : 4;
         $duration_s = $duration * 3600;
         $table_check="SHOW TABLES LIKE 'jcr_session'";
         $table=$conn->query($table_check);
         if ($table->num_rows>0){
+            
+            function no_of_voters(){
+                include 'connect.php';
+                $getVoters="SELECT * FROM voters";
+                $result=$conn->query($getVoters);
+                $Voters=$result->num_rows;
+                return $Voters;
+            }
+            $voters = no_of_voters();
             include 'links.php';
             $time = date('Y-m-d H:i:s');
             $insert="UPDATE jcr_session SET status = 1, begin = '$time', duration = '$duration_s' WHERE session = 'start'";
@@ -464,15 +473,7 @@ if (isset($_POST['jdeletC'])){
                     $SuccessMsg = "sent";
                     $FailedMsg = "failed";
 
-                    $i == 0;
-                    function no_of_voters(){
-                        include 'connect.php';
-                        $getVoters="SELECT * FROM voters";
-                        $result=$conn->query($getVoters);
-                        $Voters=$result->num_rows;
-                        return $Voters;
-                    }
-                    $voters = no_of_voters();
+                    $i = 1;
                     foreach ($email as $To){
                         $per = ($voters != 0) ? number_format(($i / $voters) * 100, 2) : 0;
                         echo <<<EOT
@@ -513,13 +514,10 @@ if (isset($_POST['jdeletC'])){
                                 $insertQuery="INSERT INTO jcr_sent_links(Student_Email,Link_Sent)
                                 VALUES('$To','$_SESSION[jlink]')";
                                 $conn->query($insertQuery);
-                            }else {
-                                echo "Mail failed!";
                             }
                             
                         }
                     }
-                    header("location: ad.jcr.php?Login=success");
         }else{
             $create_table="CREATE TABLE jcr_session(
                 session VARCHAR(5),
@@ -532,7 +530,6 @@ if (isset($_POST['jdeletC'])){
                         VALUES ('start','','',0,0)";
             $conn->query($create_table);
             $conn->query($insert);
-            header("location: ad.jcr.php?Login=success");
         }
     }
 

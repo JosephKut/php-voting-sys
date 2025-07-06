@@ -1,14 +1,3 @@
-<?php
-    function no_of_voters(){
-        include 'connect.php';
-        $getVoters="SELECT * FROM voters";
-        $result=$conn->query($getVoters);
-        $Voters=$result->num_rows;
-        return $Voters;
-    }
-    $voters = no_of_voters();
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -27,7 +16,7 @@
                         Number of voters: <?php echo $voters; ?>
                     </div>
                     <div class="vote-bar">
-                        <div class="vote-fill" id="fill" style="width: <?php echo $per;?>%"></div>
+                        <div class="vote-fill" id="fill" style="width: 0%"></div>
                     </div>
                     <div class="vote-stats">
                         <span id="links_sent">links sent:</span>
@@ -35,6 +24,7 @@
                     </div>
                 </div>
             </div>
+            <button onclick="window.history.back();" style="margin-top:15px; width: 100px; margin-left: 80%;">Back</button>
         </div>
     </div>
 </body>

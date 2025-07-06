@@ -15,17 +15,26 @@ if (!$_SESSION['Email']){
     session_destroy();
     die();    
 }
+include 'connect.php';
 // config.php - Database configuration
 class DatabaseConfig {
-    private $host = 'localhost';
-    private $username = 'root';
-    private $password = 'JK';
-    private $database = 'umat_src_poll';
+    private $dbhost ;   // 'localhost';
+    private $username;  // 'root';
+    private $password ; // 'JK';
+    private $database ; // 'umat_src_poll';
     public $conn;
 
     public function __construct() {
+        global $dbs;
+        global $pass;
+        global $user;
+        global $host;
+        $this->database = $dbs;
+        $this->password = $pass;
+        $this->username = $user;
+        $this->dbhost = $host;
         try {
-            $this->conn = new PDO("mysql:host={$this->host};dbname={$this->database}", 
+            $this->conn = new PDO("mysql:host={$this->dbhost};dbname={$this->database}", 
                                  $this->username, $this->password);
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch(PDOException $e) {
