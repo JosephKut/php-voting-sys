@@ -2,7 +2,7 @@
 $HostEmail = "josephkuttor730@gmail.com";
 $HostEmailKey = "ooupcvqmnwkzwjfn";
 
-$Domain = "https://hall.ghprofit.com/";
+$Domain = "";//"https://hall.ghprofit.com/";
 // $Route_Domain = "https://hall.ghprofit.com/";
 
 $Host = "localhost";

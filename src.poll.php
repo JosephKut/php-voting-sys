@@ -12,7 +12,7 @@ else{
     die();
 }
 
-include("connect.php");
+// include("connect.php");
 include("func.php");
 
 $posts=get_post();
@@ -49,8 +49,8 @@ include("resources.php");
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href=<?php echo ($Domain."vo.css");?>>
-    <link rel="stylesheet" href=<?php echo ($Domain."login.css");?>>
+    <link rel="stylesheet" href=<?php echo ($Domain."vo.css"); ?> >
+    <link rel="stylesheet" href=<?php echo ($Domain."login.css"); ?> >
     <title>UMAT-SRID VOTING SYSTEM</title>
 </head>
 <body>
@@ -69,8 +69,8 @@ include("resources.php");
             <button type="submit" name="signIn">Log In</button>
         </form>
         <div class="im">
-            <marquee><img src="images/m.jpeg" width="250" class="simg"></marquee>
-            <img src="images/c7.jpeg" width="150" class="simg">
+            <!-- <marquee><img src="images/m.jpeg" width="250" class="simg"></marquee>
+            <img src="images/c7.jpeg" width="150" class="simg"> -->
         </div>
     </div>
 
